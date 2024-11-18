@@ -1,0 +1,23 @@
+{
+    "products": [
+      {
+        "id": 1,
+        "name": "Product 1",
+        "date": "2024-11-01",
+        "location": "New York",
+        "buyers": [
+          { "name": "Alice Johnson", "email": "alice@example.com", "location": "NYC", "phone": "123-456-7890", "date": "2024-11-02", "quantity": 2, "amount": 120 },
+          { "name": "Bob Smith", "email": "bob@example.com", "location": "Chicago", "phone": "098-765-4321", "date": "2024-11-03", "quantity": 1, "amount": 60 }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Product 2",
+        "date": "2024-10-25",
+        "location": "Los Angeles",
+        "buyers": [
+          { "name": "Carol White", "email": "carol@example.com", "location": "LA", "phone": "321-654-0987", "date": "2024-10-26", "quantity": 3, "amount": 180 }
+        ]
+      }
+    ]
+  }
