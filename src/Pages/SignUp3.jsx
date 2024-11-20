@@ -14,7 +14,7 @@ import More from "../assets/images/more.svg";
 const SignUp3 = () => {
   const [selectedGender, setSelectedGender] = useState(null);
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState({});
 
   const icons = [
     { src: Blog, alt: "Blog" },
@@ -91,7 +91,7 @@ const SignUp3 = () => {
               <input
                 type="email"
                 {...register("email", { required: true })}
-                placeholder="jaco3927@naver.com"
+                placeholder="이메일을 입력해주세요"
               />
               <label htmlFor="" className="block">
                 비밀번호
@@ -99,7 +99,7 @@ const SignUp3 = () => {
               </label>
               <input
                 type="password"
-                placeholder="jaco3927"
+                placeholder="비밀번호를 입력해주세요"
                 {...register("password", { required: true, minLength: 4 })}
               />
               {errors.email && <p className="error">Email is required</p>}
@@ -110,7 +110,7 @@ const SignUp3 = () => {
               </label>
               <input
                 type="text"
-                placeholder="최진성"
+                placeholder="성함을 입력해주세요"
                 {...register("name", {
                   required: true,
                   minLength: 3,
@@ -127,19 +127,21 @@ const SignUp3 = () => {
                 </label>
                 <div className="flex justify-between">
                   <input
-                    placeholder="010-4896-3411"
+                    placeholder="휴대폰 번호를 입력해주세요"
                     type="text"
                     {...register("phoneNumber", { required: true })}
                     style={{ width: "256px", height: "38px" }}
                   />
-                  <input
-                    type="number"
-                    placeholder="인증번호 받기"
+                   <div
+                    className="border text-black px-4 py-2 rounded-[5px] text-sm cursor-pointer text-center"
                     style={{ width: "123px", height: "40px" }}
-                  />
+                  >
+                    인증번호 받기
+                  </div>
                 </div>
-                <p className="message">휴대폰 인증을 진행해 주세요.</p>
+                
               </div>
+              <p className="message">휴대폰 인증을 진행해 주세요.</p>
               {/* Birthdate and Gender */}
               <div className="birthandgender flex gap-3">
                 <div className="birthday">
@@ -148,7 +150,7 @@ const SignUp3 = () => {
                     type="date"
                     {...register("birthdate")}
                     placeholder="1996.12.03"
-                    className="calender"
+                    className="calender pr-2"
                   />
                 </div>
                 <div className="gender">
@@ -202,8 +204,17 @@ const SignUp3 = () => {
                   {icons.map((icon, index) => (
                     <div
                       key={index}
-                      className={`fb ${activeIndex === index ? "active" : ""}`}
-                      onClick={() => setActiveIndex(index)}
+                      className={`fb ${activeIndex[index] ? "active" : ""}`}
+                      onClick={() => {
+                        if(activeIndex[index]){
+                          const newActiveIndex = {...activeIndex};
+                          delete newActiveIndex[index];
+                          setActiveIndex(newActiveIndex);
+                        }else{
+                          setActiveIndex({...activeIndex, [index]: [icon.alt]});
+                        }
+                        console.log(activeIndex);
+                      }}
                     >
                       <img src={icon.src} alt={icon.alt} />
                     </div>
@@ -214,12 +225,23 @@ const SignUp3 = () => {
               <label htmlFor="" className="block">
                 네이버 플레이스 or 홈페이지 주소 URL
               </label>
-              <input
-                type="email"
-                placeholder="https://blog.naver.com/jaco3927"
-              />
+              
+              {Object.keys(activeIndex).map((index) => (
+                <input
+                  onChange={(e) => {
+                    const newActiveIndex = {...activeIndex};
+                    newActiveIndex[index] = [activeIndex[index][0], e.target.value];
+                    setActiveIndex(newActiveIndex);
+                    console.log(activeIndex);
+                  }}
+                  key={index}
+                  type="text"
+                  placeholder={`${activeIndex[index]}의 주소를 입력하세요`}
+                  className="influencer-input"
+                />
+              ))}
 
-              <div className="checkbox-container">
+              <div className="checkbox-container mt-8">
                 <label htmlFor="">약관 동의</label>
                 <div className="flex items-center justify-between ">
                   <div className="flex items-center gap-6">
@@ -285,15 +307,6 @@ const SignUp3 = () => {
               <button className="sigup-button">가입하기</button>
             </form>
           </div>
-        </div>
-
-        <div className="how-to-use mx-auto">
-          <ul className="flex gap-6 mt-4">
-            <li>About us</li>
-            <li>Become Merchant</li>
-            <li>How to use</li>
-            <li>Privacy policy</li>
-          </ul>
         </div>
       </div>
     </>

@@ -79,7 +79,7 @@ const InfluencerForm = () => {
               <input
                 type="email"
                 {...register("email", { required: true })}
-                placeholder="jaco3927@naver.com"
+                placeholder="이메일을 입력해주세요"
               />
               <label htmlFor="" className="block">
                 비밀번호
@@ -87,7 +87,7 @@ const InfluencerForm = () => {
               </label>
               <input
                 type="password"
-                placeholder="jaco3927"
+                placeholder="비밀번호를 입력해주세요"
                 {...register("password", { required: true, minLength: 4 })}
               />
               {errors.email && <p className="error">Email is required</p>}
@@ -98,7 +98,7 @@ const InfluencerForm = () => {
               </label>
               <input
                 type="text"
-                placeholder="최진성"
+                placeholder="성함을 입력해주세요"
                 {...register("name", {
                   required: true,
                   minLength: 3,
@@ -115,16 +115,17 @@ const InfluencerForm = () => {
                 </label>
                 <div className="flex justify-between">
                   <input
-                    placeholder="010-4896-3411"
+                    placeholder="휴대폰 번호를 입력해주세요"
                     type="text"
                     {...register("phoneNumber", { required: true })}
                     style={{ width: "256px", height: "38px" }}
                   />
-                  <input
-                    type="number"
-                    placeholder="인증번호 받기"
+                  <button
+                    className="border text-black px-4 py-2 rounded-[5px] text-sm cursor-pointer text-center"
                     style={{ width: "123px", height: "40px" }}
-                  />
+                  >
+                    인증번호 받기
+                  </button>
                 </div>
                 <p className="message">휴대폰 인증을 진행해 주세요.</p>
               </div>
@@ -134,7 +135,7 @@ const InfluencerForm = () => {
               </label>
               <input
                 type="text"
-                placeholder="최진성"
+                placeholder="상호명을 입력해주세요"
                 {...register("influenceType", { required: true })}
               />
               <p className="message">필수 입력 사항입니다.</p>
@@ -144,7 +145,7 @@ const InfluencerForm = () => {
               </label>
               <input
                 type="email"
-                placeholder="https://blog.naver.com/jaco3927"
+                placeholder="주소를 입력해주세요"
               />
               <p className="message">
                 본인의 업체와 관계없는 링크 기입 시 불이익이 있을 수 있습니다.
