@@ -154,7 +154,7 @@ const Navbar = () => {
                         to="/add/campian"
                         className="rounded-md px-3 py-2"
                       >
-                        Add campaign
+                        상품 추가
                       </NavLink>
                     )}
                   <div className="relative inline-block rounded-md px-3 py-2">
@@ -162,7 +162,7 @@ const Navbar = () => {
                       onClick={toggleDropdown}
                       className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
                     >
-                      Notifications
+                      알림
                     </NavLink>
                     {isOpen && (
                       <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-4">
@@ -186,7 +186,7 @@ const Navbar = () => {
                     to="/UnderDev"
                     className="rounded-md px-3 py-2 text-sm font-medium"
                   >
-                    How to use
+                    사용법 
                   </NavLink>
 
                   {name ? (
@@ -259,7 +259,7 @@ const Navbar = () => {
                               e.target.style.transform = "scale(1)";
                             }}
                           >
-                            Logout
+                            로그아웃
                           </button>
 
                           {signupType === "SignUp2" && (
@@ -274,20 +274,20 @@ const Navbar = () => {
                               }}
                               onClick={() => setIsDropdownOpen(false)}
                             >
-                              Register
+                              상품등록
                             </Link>
                           )}
                         </div>
                       )}
                     </>
                   ) : (
-                    <NavLink
-                      to="login"
-                      className="font-medium Login w-100"
-                      style={{ padding: "8px 16px", color: "#007bff" }}
+                    <Link
+                      to={"/login"}
+                      className="font-medium w-100 border border-gray-300 bg-[#2C9512] rounded-[10px] py-2 px-6"
+                      style={{ color: "white" }}
                     >
-                      Login
-                    </NavLink>
+                      로그인
+                    </Link>
                   )}
                 </div>
               </div>

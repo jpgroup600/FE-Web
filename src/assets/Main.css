@@ -414,7 +414,6 @@ footer .copyright p {
 }
 
 .login-form {
-  padding: 160px 90px 900px 90px;
   display: flex;
   justify-content: center;
   flex-direction: column;

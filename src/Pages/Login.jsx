@@ -99,20 +99,18 @@ const Login = () => {
 
   const [activeTab, setActiveTab] = useState("reviewer");
   return (
-    <>
-      <div className="container mx-auto">
+    <div>
+      <div className="h-[50vh] flex items-center justify-center">
         <div className="login-form mx-auto">
           <div className="login-log">
-            <h3>Logo</h3>
           </div>
           <div className="form-outline">
             {/* Tab Section */}
             <div className="flex justify-between">
               {/* Reviewer Tab */}
               <div
-                className={`review-section flex items-center justify-center w-1/2 p-4 cursor-pointer ${
-                  activeTab === "reviewer" ? "bg-gray-100" : ""
-                }`}
+                className={`review-section flex items-center justify-center w-1/2 p-4 cursor-pointer ${activeTab === "reviewer" ? "" : "bg-gray-100"
+                  }`}
                 onClick={() => setActiveTab("reviewer")}
                 style={{ borderTopLeftRadius: 20 }}
               >
@@ -122,14 +120,13 @@ const Login = () => {
                   className="w-5 h-5"
                   style={{ marginRight: 10 }}
                 />
-                <h3>Reviewer</h3>
+                <h3>리뷰어</h3>
               </div>
 
               {/* Merchant Tab */}
               <div
-                className={`review-section flex items-center justify-center w-1/2 p-4 cursor-pointer ${
-                  activeTab === "merchant" ? "bg-gray-100" : ""
-                }`}
+                className={`review-section flex items-center justify-center w-1/2 p-4 cursor-pointer ${activeTab === "merchant" ? "" : "bg-gray-100"
+                  }`}
                 onClick={() => setActiveTab("merchant")}
                 style={{ borderTopRightRadius: 20 }}
               >
@@ -139,13 +136,14 @@ const Login = () => {
                   className="w-5 h-5"
                   style={{ marginRight: 10 }}
                 />
-                <h3>Merchant</h3>
+                <h3>사장님</h3>
               </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="form-group">
                 <input
+                  className="w-full h-11 rounded-[10px] border border-gray-300 p-2"
                   {...register("email", { required: true })}
                   type="email"
                   placeholder="UserName"
@@ -155,6 +153,7 @@ const Login = () => {
 
               <div className="form-group mt-2">
                 <input
+                  className="w-full h-11 rounded-[10px] border border-gray-300 p-2"
                   {...register("password", { required: true })}
                   type="password"
                   placeholder="Password"
@@ -174,54 +173,42 @@ const Login = () => {
             </form>
 
             <div className="find-passowrd flex items-center justify-between px-3 mt-4">
-              <div className="checkbox-password flex items-center gap-5">
+              <div className="checkbox-password flex items-center gap-2">
                 <input type="checkbox" />
-                <p>Auto Login</p>
+                <p>자동 로그인</p>
               </div>
               <div className="find-passowrd">
-                <p>Find Id | Password find</p>
+                <p>아이디 | 비밀번호 찾기</p>
               </div>
             </div>
 
             {/* Login with  */}
 
-            <div className="login-with flex items-center cursor-pointer	 ">
-              <img src={NewverLogin} alt="" className="px-5" />
-              <p>Naver Login</p>
+            <div className="border 1px border-gray-300 rounded-[20px] h-11 mt-4 flex items-center cursor-pointer">
+              <img src={NewverLogin} alt="" className="px-5 w-[100px] h-[25px]" />
+              <p className="text-gray-500">네이버 로그인</p>
             </div>
 
-            <div className="login-with flex items-center cursor-pointer	">
-              <p className="fb">Facebook Login</p>
-            </div>
+            <div className="border 1px border-gray-300 rounded-[20px] h-11 mt-4 flex items-center cursor-pointer">
+              <div className="flex items-center justify-center">
+                <Link to={"/option"} className="flex items-center ">
+                  <img src={LoginIcon} alt="Login Icon" className="px-5 w-[100px] h-[25px] scale-[0.8]" />
+                  <div className="flex items-center justify-center">
+                    <p className="text-gray-500">회원 가입</p>
+                  </div>
+                </Link>
+              </div>
 
-            <div className="login-with flex items-center cursor-pointer	">
-              <img src={Kakao} alt="" className="px-5" />
-              <p>Kakao Login</p>
+
             </div>
 
             {/* Reviewers Register */}
 
-            <div className="review-bottom flex justify-center gap-3">
-              <div className="login-with flex  cursor-pointer justify-center">
-                <Link to={"/option"} className="flex items-center ">
-                  <img src={LoginIcon} alt="Login Icon" className="w-5 h-5" />
-                  <p className="text-center">Register</p>
-                </Link>
-              </div>
-            </div>
 
-            <div className="how-to-use mx-auto">
-              <ul className="flex gap-6 mt-4">
-                <li>About us</li>
-                <li>Become Merchant</li>
-                <li>How to use</li>
-                <li>Privacy policy</li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

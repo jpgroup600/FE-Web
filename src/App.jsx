@@ -29,7 +29,7 @@ const App = () => {
   const [userID, setUserID] = useState(localStorage.getItem('userID') || '');
   return (
     <AuthContext.Provider value={{ token, setToken, email, setEmail, name, setname, userID, setUserID }}>
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column'}}>
       <Navbar />
       <div style={{ flex: 1 }}>
         <Routes>
@@ -49,7 +49,7 @@ const App = () => {
           <Route path="/UnderDev" element={<UnderDev />} />
         </Routes>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   </AuthContext.Provider>
   );
