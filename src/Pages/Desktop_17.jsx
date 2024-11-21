@@ -20,6 +20,7 @@ const Desktop17 = () => {
   const scrollToMissionRef = useRef(null);
   const scrollToKeyWordRef = useRef(null);
   const scrollToAditionalRef = useRef(null);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -172,6 +173,32 @@ const Desktop17 = () => {
     fetchData();
   }, [email, token]);
   const [moreButton, setMoreButton] = useState(false);
+  const [channelName, setChannelName] = useState("");
+
+  const [NewChannel, setNewChannel] = useState([]);
+
+  const changeChanelName = (channel) => {
+    let text =  channel;
+    let newList = []
+    text?.map ((i) => {
+      if (i == "youtube"){
+            newList.push("유튜브");
+          }
+          if (i == "instagram"){
+            newList.push("인스타그램");
+          }
+          if (i == "blog"){
+            newList.push("블로그");
+          }
+          if (i == "tiktok"){
+            newList.push("틱톡");
+          }
+    }) 
+    
+    console.log(newList);
+  }
+
+
   return (
     <>
       <div className="container mx-auto  2xl:px-12">
@@ -276,9 +303,18 @@ const Desktop17 = () => {
                   <td className="pb-3">08.02 (토)</td>
                 </tr>
                 <tr>
-                  <td className="pb-3">Current Enroll</td>
+                  <td className="pb-3">지원 방식</td>
                   <td className="pb-3">
-                    {product?.channel || "지원 51 / 모집 1"}
+                    {
+                      product?.channel
+                    }
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="pb-3">지원 현황</td>
+                  <td className="pb-3">
+                    {product ? `최대 인원 ${product?.numberOfPeople} / 지원 인원 ${product?.registeredUsers.length}` : "최대인원 / 지원인원 "}
                   </td>
                 </tr>
                 <tr>
