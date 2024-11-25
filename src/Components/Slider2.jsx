@@ -42,6 +42,7 @@ const Slider2 = () => {
         );
 
         if (response.status === 200) {
+          console.log("Data fetched successfully:", response.data);
           setItem(response.data);
 
           // Filter data to show items with less than or equal to 1 day left
@@ -54,7 +55,7 @@ const Slider2 = () => {
             return daysLeft <= 1 && daysLeft >= 0;
           });
 
-          setDataLastDayLeft(filteredData);
+          setDataLastDayLeft(filteredData);  
         }
       } catch (error) {
         console.error("Error fetching data:", error);

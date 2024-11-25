@@ -39,7 +39,7 @@ const Category = () => {
 
   // const  limitedData = item
 
-  console.log(limitedData);
+  console.log("limited data",limitedData);
 
   return (
     <div className="container mx-auto mt-12 lg:px-12">

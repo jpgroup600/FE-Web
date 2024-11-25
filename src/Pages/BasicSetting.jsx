@@ -193,6 +193,7 @@ const BasicSetting = () => {
       const derivedData = {
         userId: localStorage.getItem("userID"),
         email,
+        setToCompaign: isCompaign,
         campaignName: userData.campaignName,
         isVisitOrShip: activeVisit ? "Visit" : "Ship",
         location: `Sido: ${userData.address?.sido} | Sigungu: ${userData.address?.sigungu} | Address: ${userData.address?.address}`,
@@ -217,8 +218,6 @@ const BasicSetting = () => {
           `https://webjacob-c0f6c8e947aa.herokuapp.com/${img[3]?.path}` || " ",
         catagory: userData.catagory,
       };
-      console.log("Data", derivedData);
-      console.log("Location", userData.address);
       const response = await fetch(
         "https://webjacob-c0f6c8e947aa.herokuapp.com/products/add",
         {
@@ -245,6 +244,7 @@ const BasicSetting = () => {
   const [test, settest] = useState(true);
 
   const [activeVisit, setActiveVisit] = useState(false);
+  const [isCompaign, setIsCompaign] = useState(false);
   const [activeChanel, setActiveChanel] = useState([]);
   const [activeWeek, setActiveWeek] = useState([]);
   const [userData, setUserData] = useState(basicSettings);
@@ -325,9 +325,8 @@ const BasicSetting = () => {
               <h3>가능한 요일</h3>
               <div className="flex justify-between mt-4">
                 <div
-                  className={`${
-                    activeWeek.includes("mon") ? "weekend-active" : "weekend"
-                  }`}
+                  className={`${activeWeek.includes("mon") ? "weekend-active" : "weekend"
+                    }`}
                   onClick={() => {
                     checkWeek("mon");
                   }}
@@ -336,9 +335,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeWeek.includes("tue") ? "weekend-active" : "weekend"
-                  }`}
+                  className={`${activeWeek.includes("tue") ? "weekend-active" : "weekend"
+                    }`}
                   onClick={() => {
                     checkWeek("tue");
                   }}
@@ -347,9 +345,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeWeek.includes("wen") ? "weekend-active" : "weekend"
-                  }`}
+                  className={`${activeWeek.includes("wen") ? "weekend-active" : "weekend"
+                    }`}
                   onClick={() => {
                     checkWeek("wen");
                   }}
@@ -358,9 +355,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeWeek.includes("thur") ? "weekend-active" : "weekend"
-                  }`}
+                  className={`${activeWeek.includes("thur") ? "weekend-active" : "weekend"
+                    }`}
                   onClick={() => {
                     checkWeek("thur");
                   }}
@@ -369,9 +365,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeWeek.includes("fri") ? "weekend-active" : "weekend"
-                  }`}
+                  className={`${activeWeek.includes("fri") ? "weekend-active" : "weekend"
+                    }`}
                   onClick={() => {
                     checkWeek("fri");
                   }}
@@ -380,9 +375,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeWeek.includes("sat") ? "weekend-active" : "weekend"
-                  }`}
+                  className={`${activeWeek.includes("sat") ? "weekend-active" : "weekend"
+                    }`}
                   onClick={() => {
                     checkWeek("sat");
                   }}
@@ -391,9 +385,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeWeek.includes("sun") ? "weekend-active" : "weekend"
-                  }`}
+                  className={`${activeWeek.includes("sun") ? "weekend-active" : "weekend"
+                    }`}
                   onClick={() => {
                     checkWeek("sun");
                   }}
@@ -571,6 +564,30 @@ const BasicSetting = () => {
               >
                 <h4>Ship</h4>
                 <p>Get shipping and review</p>
+              </div>
+            </div>
+
+            {/* --------------set as compaign---------- */}
+            <h2 className="mt-5">Set Product as Campaign</h2>
+            <div className="flex justify-between">
+              <div
+                className={` ${isCompaign ? "visti" : "ship"}`}
+                onClick={() => {
+                  setIsCompaign(true);
+                  setUserData({ ...userData, setToCompaign:true });
+                }}
+              >
+                <h4>Yes</h4>
+              </div>
+
+              <div
+                className={` ${isCompaign ? "ship" : "visti"}`}
+                onClick={() => {
+                  setIsCompaign(false);
+                  setUserData({ ...userData, setToCompaign: false });
+                }}
+              >
+                <h4>No</h4>
               </div>
             </div>
 
@@ -864,9 +881,8 @@ const BasicSetting = () => {
               <h3>Chanel</h3>
               <div className="flex justify-between mt-4">
                 <div
-                  className={`${
-                    activeChanel.includes("youtube") ? "youtube" : "insta"
-                  }`}
+                  className={`${activeChanel.includes("youtube") ? "youtube" : "insta"
+                    }`}
                   onClick={() => {
                     checkChanel("youtube");
                   }}
@@ -875,9 +891,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeChanel.includes("instagram") ? "youtube" : "insta"
-                  }`}
+                  className={`${activeChanel.includes("instagram") ? "youtube" : "insta"
+                    }`}
                   onClick={() => {
                     checkChanel("instagram");
                   }}
@@ -886,9 +901,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeChanel.includes("blog") ? "youtube" : "insta"
-                  }`}
+                  className={`${activeChanel.includes("blog") ? "youtube" : "insta"
+                    }`}
                   onClick={() => {
                     checkChanel("blog");
                   }}
@@ -897,9 +911,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeChanel.includes("web") ? "youtube" : "insta"
-                  }`}
+                  className={`${activeChanel.includes("web") ? "youtube" : "insta"
+                    }`}
                   onClick={() => {
                     checkChanel("web");
                   }}
@@ -908,9 +921,8 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${
-                    activeChanel.includes("etc") ? "youtube" : "insta"
-                  }`}
+                  className={`${activeChanel.includes("etc") ? "youtube" : "insta"
+                    }`}
                   onClick={() => {
                     checkChanel("Tiktok");
                   }}

@@ -21,4 +21,5 @@ export const basicSettings = {
   keywords: "",
   info: "",
   howtoregister: "",
+  setToCompaign:false,
 };
