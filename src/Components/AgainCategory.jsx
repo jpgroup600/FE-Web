@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import CategoryData from "../JsonData/Category.json";
 import Blog from "../assets/images/Blog.svg"
 import { AppProvider } from "../ContextApi/Api";
 import { Link } from "react-router-dom";

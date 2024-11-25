@@ -6,6 +6,8 @@ import Image from "../assets/images/Logo.svg";
 import axios from "axios";
 import { AuthContext } from "../App"; // Assuming AuthContext is properly set
 import { AppProvider } from "../ContextApi/Api"; // Assuming AppProvider is properly set
+import Blog from "../assets/images/Blog.svg"
+import { Link } from "react-router-dom";
 
 const Slider2 = () => {
   const [time, setTime] = useState(new Date());
@@ -21,6 +23,7 @@ const Slider2 = () => {
     const intervalId = setInterval(updateTime, 1000);
 
     return () => clearInterval(intervalId);
+
   }, []);
   const formatTime = (date) => {
     const hours = String(date.getHours()).padStart(2, "0");
@@ -46,17 +49,17 @@ const Slider2 = () => {
           setItem(response.data);
 
           // Filter data to show items with less than or equal to 1 day left
-            const filteredData = response.data.filter((item) => {
-              const createdAtDate = new Date(item.createdAt);
-              const daysPassed = Math.floor(
-                (new Date() - createdAtDate) / (1000 * 60 * 60 * 24)
-              );
-              const daysLeft = 14 - daysPassed;
-              return daysLeft <= 1 && daysLeft >= 0 &&item.setToCompaign;
-            });
+          const filteredData = response.data.filter((item) => {
+            const createdAtDate = new Date(item.createdAt);
+            const daysPassed = Math.floor(
+              (new Date() - createdAtDate) / (1000 * 60 * 60 * 24)
+            );
+            const daysLeft = 14 - daysPassed;
+            return daysLeft <= 1 && daysLeft >= 0 && item.setToCompaign;
+          });
 
-            console.log("Filtered data:", filteredData);
-          setDataLastDayLeft(filteredData);  
+          console.log("Filtered data:", filteredData);
+          setDataLastDayLeft(filteredData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -65,6 +68,7 @@ const Slider2 = () => {
     };
 
     fetchData();
+
   }, [email, token]);
 
   const settings = {
@@ -94,6 +98,15 @@ const Slider2 = () => {
     ],
   };
 
+  // ==========new data================
+  // const data = item;
+
+  // let SliceData = data.slice(8, 16)
+
+  // if (SliceData.length === 0) {
+  //   return <h1>No items Found</h1>
+  // }
+
   return (
     <>
       <div className="slider-container mx-auto slider-2 container-fluid 2xl:px-12">
@@ -109,18 +122,32 @@ const Slider2 = () => {
           <Slider {...settings}>
             {DataLastDayLeft.map((slide) => (
               <div key={slide.id} className="2xl:ms-3">
-                <div className="lg:px-3 2xl:px-0 mb-2">
-                  <img
-                    src={slide.image}
-                    alt={`Slide ${slide.id}`}
-                    style={{
-                      borderRadius: "10px",
-                      width: "291px",
-                      height: "163px",
-                    }}
-                  />
+                <Link to={`/view/${slide._id}`}>
+
+                  <div className="lg:px-3 2xl:px-0 mb-2">
+                    <img
+                      src={slide.image}
+                      alt={`Slide ${slide.id}`}
+                      style={{
+                        borderRadius: "10px",
+                        width: "291px",
+                        height: "163px",
+                      }}
+                    />
+                  </div>
+                </Link>
+                <div className="mx-3 text-white">
+                  <h3 className="text-start font-bold text-white mb-3 mt-4 flex items-center gap-2">
+                    {slide.campaignName}
+                  </h3>
+                  {/* <h4 className="text-start text-xs text-gray-300">
+                    {slide.location}
+                  </h4> */}
+                  <h5 className="text-start mb-3 text-sm text-white"> {slide.location}</h5>
                 </div>
               </div>
+
+
             ))}
           </Slider>
         ) : (
@@ -128,8 +155,9 @@ const Slider2 = () => {
             <h4>Nothing to show</h4>
           </div>
         )}
-      </div>
+      </div >
     </>
+
   );
 };
 

@@ -8,6 +8,7 @@ import UnderDev from "../Pages/UnderDev";
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { name, setname, setToken, setEmail } = useContext(AuthContext); // Access context values
+  const da = useContext(AuthContext); // Access context values
   const { email, token, userID } = useContext(AuthContext);
   const navigate = useNavigate(); // Navigation
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
