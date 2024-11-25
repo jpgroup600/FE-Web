@@ -105,7 +105,7 @@ const Slider2 = () => {
           <h4>미리 찜해두고 혜택 받아가세요!!</h4>
         </div>
 
-        {1 > 0 ? (
+        {DataLastDayLeft.length > 0 ? (
           <Slider {...settings}>
             {DataLastDayLeft.map((slide) => (
               <div key={slide.id} className="2xl:ms-3">
