@@ -46,15 +46,16 @@ const Slider2 = () => {
           setItem(response.data);
 
           // Filter data to show items with less than or equal to 1 day left
-          const filteredData = response.data.filter((item) => {
-            const createdAtDate = new Date(item.createdAt);
-            const daysPassed = Math.floor(
-              (new Date() - createdAtDate) / (1000 * 60 * 60 * 24)
-            );
-            const daysLeft = 14 - daysPassed;
-            return daysLeft <= 1 && daysLeft >= 0;
-          });
+            const filteredData = response.data.filter((item) => {
+              const createdAtDate = new Date(item.createdAt);
+              const daysPassed = Math.floor(
+                (new Date() - createdAtDate) / (1000 * 60 * 60 * 24)
+              );
+              const daysLeft = 14 - daysPassed;
+              return daysLeft <= 1 && daysLeft >= 0 &&item.setToCompaign;
+            });
 
+            console.log("Filtered data:", filteredData);
           setDataLastDayLeft(filteredData);  
         }
       } catch (error) {
@@ -104,7 +105,7 @@ const Slider2 = () => {
           <h4>미리 찜해두고 혜택 받아가세요!!</h4>
         </div>
 
-        {DataLastDayLeft.length > 0 ? (
+        {1 > 0 ? (
           <Slider {...settings}>
             {DataLastDayLeft.map((slide) => (
               <div key={slide.id} className="2xl:ms-3">
