@@ -193,7 +193,6 @@ const BasicSetting = () => {
       const derivedData = {
         userId: localStorage.getItem("userID"),
         email,
-        setToCompaign: isCompaign,
         campaignName: userData.campaignName,
         isVisitOrShip: activeVisit ? "Visit" : "Ship",
         location: `Sido: ${userData.address?.sido} | Sigungu: ${userData.address?.sigungu} | Address: ${userData.address?.address}`,
@@ -567,29 +566,6 @@ const BasicSetting = () => {
               </div>
             </div>
 
-            {/* --------------set as compaign---------- */}
-            <h2 className="mt-5">Set Product as Campaign</h2>
-            <div className="flex justify-between">
-              <div
-                className={` ${isCompaign ? "visti" : "ship"}`}
-                onClick={() => {
-                  setIsCompaign(true);
-                  setUserData({ ...userData, setToCompaign:true });
-                }}
-              >
-                <h4>Yes</h4>
-              </div>
-
-              <div
-                className={` ${isCompaign ? "ship" : "visti"}`}
-                onClick={() => {
-                  setIsCompaign(false);
-                  setUserData({ ...userData, setToCompaign: false });
-                }}
-              >
-                <h4>No</h4>
-              </div>
-            </div>
 
             {/* 나머지 주소 입력 */}
 
