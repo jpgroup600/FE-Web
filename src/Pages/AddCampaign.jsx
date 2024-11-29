@@ -5,14 +5,62 @@ import { basicSettings } from "../Constants/ConstBasic";
 import DaumPostcode from "react-daum-postcode";
 import { AuthContext } from "../App"; // Import the context
 import axios from "axios";
+import ImageUploader from "../Components/ImageUploader";
+import apiUrl from "../hooks/apiUrl";
+import { useNavigate } from "react-router-dom";
 
-const BasicSetting = () => {
+const AddCampaign = () => {
   const { email, token, userID } = useContext(AuthContext); // Access context values
   const [uploadedImagesNew, setUploadedImagesNEw] = useState([]);
   const [fill, setFill] = useState([]);
   const [tabs, settabs] = useState([]);
+  const [thumbnailFiles, setThumbnailFiles] = useState([]);
+  const [mainFiles, setMainFiles] = useState([]);
+  const thumbnailInputRef = useRef(null);
+  const mainInputRef = useRef(null);
+  
+  const [files, setFiles] = useState([]);
+  const fileInputRef = useRef(null);
+  const [thumbnailPath, setThumbnailPath] = useState([]);
+  const [mainImagePaths, setMainImagePaths] = useState([]);
 
+  const MainMaxFiles = 5;
+  const ThumbnailMaxFiles = 3;
+  const navigate = useNavigate();
   // console.log(token, "token");
+
+
+
+  const handleMainFileChange = async (event,setFilesState, fileState, setImagepathState, maxFiles) => {
+    const newFiles = Array.from(event.target.files);
+    console.log("mainFiles", fileState);
+    if(fileState.length + newFiles.length <= maxFiles) {
+      setFilesState([...fileState, ...newFiles]);
+
+      try {
+        const uploadedFiles = await uploadImages(newFiles);
+        console.log("uploadedFiles", uploadedFiles);
+
+        if(uploadedFiles) {
+          const newPaths = uploadedFiles.files.map(file => apiUrl+"/"+file.path)
+          setImagepathState(prev => [...prev, ...newPaths]);
+          console.log("newPaths", newPaths)
+
+        }
+      }
+
+      catch (error) {
+        console.error("Upload failed:", error);
+      }
+
+    }
+
+    else {
+      alert(`최대 이미지 ${maxFiles} 까지만 업로드 가능합니다`);
+    }
+
+  };
+
   useEffect(() => {
     const fetchHeads = async () => {
       try {
@@ -47,8 +95,7 @@ const BasicSetting = () => {
 
     fetchHeads();
   }, []);
-  const [files, setFiles] = useState([]);
-  const fileInputRef = useRef(null);
+ 
 
   const uploadImages = async (fileArray) => {
     const formData = new FormData();
@@ -59,7 +106,7 @@ const BasicSetting = () => {
 
     try {
       const response = await axios.post(
-        "https://webjacob-c0f6c8e947aa.herokuapp.com/images",
+        `${apiUrl}/images`,
         formData,
         {
           headers: {
@@ -101,8 +148,8 @@ const BasicSetting = () => {
     }
   };
 
-  const handleImageClick = () => {
-    fileInputRef.current.click();
+  const handleImageClick = (ref) => {
+    ref.current.click();
   };
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -182,9 +229,9 @@ const BasicSetting = () => {
   });
 
   const handleSubmit = async () => {
-    if (!userData.campaignName || files.length === 0) {
+    if (!userData.campaignName || mainImagePaths.length === 0 || thumbnailPath.length === 0) {
       alert(
-        "Please fill in all required fields and upload at least one image."
+        "내용 혹은 사진이 입력되지 않았습니다 해당 항목을 다 입력해주세요"
       );
       return;
     }
@@ -192,6 +239,7 @@ const BasicSetting = () => {
     try {
       const derivedData = {
         userId: localStorage.getItem("userID"),
+        service:userData.service,
         email,
         campaignName: userData.campaignName,
         isVisitOrShip: activeVisit ? "Visit" : "Ship",
@@ -202,19 +250,14 @@ const BasicSetting = () => {
         availableTime: `${userData.startTime} - ${userData.endTime}`,
         numberOfPeople: userData.member,
         image:
-          `https://webjacob-c0f6c8e947aa.herokuapp.com/${img[0]?.path}` || " ",
+          thumbnailPath || " ",
         textArea1: userData.Info,
         textArea2: userData.howtoregister,
         textArea3: userData.keywords,
         textArea4: userData.aditionalinfo,
         textArea5: "Additional details",
         channel: activeChanel.join(", "),
-        image1:
-          `https://webjacob-c0f6c8e947aa.herokuapp.com/${img[1]?.path}` || " ",
-        image2:
-          `https://webjacob-c0f6c8e947aa.herokuapp.com/${img[2]?.path}` || " ",
-        image3:
-          `https://webjacob-c0f6c8e947aa.herokuapp.com/${img[3]?.path}` || " ",
+        image1: mainImagePaths || " ",
         catagory: userData.catagory,
       };
       const response = await fetch(
@@ -230,9 +273,10 @@ const BasicSetting = () => {
       );
 
       if (response.ok) {
-        alert("Added successfully");
+        alert("캠페인이 정상적으로 등록되었습니다 관리자가 확인 진행중입니다");
+        navigate("/");
       } else {
-        alert("Failed to add campaign. Please check the data.");
+        alert("캠페인 등록에 실패하였습니다 다시 시도해주세요");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -242,7 +286,7 @@ const BasicSetting = () => {
   const [modalState, setModalState] = useState(false);
   const [test, settest] = useState(true);
 
-  const [activeVisit, setActiveVisit] = useState(false);
+  const [activeVisit, setActiveVisit] = useState(true);
   const [isCompaign, setIsCompaign] = useState(false);
   const [activeChanel, setActiveChanel] = useState([]);
   const [activeWeek, setActiveWeek] = useState([]);
@@ -255,10 +299,10 @@ const BasicSetting = () => {
     <>
       <div className="container mt-5 basic-campian-section 2xl:px-12 lg:px-5">
         <div className=" 2xl:px-12">
-          <div className="basic-setting 2xl:px-12 lg:px-0">
-            <h2>Campagin</h2>
-            <button className="bring-prev">Bring prev campaign</button>
-            <button className="reset">reset</button>
+          <div className="basic-setting 2xl:px-14 lg:px-2">
+            <h2>캠페인 설정</h2>
+            
+            <button className="reset">초기화</button>
           </div>
           <div className="basic-setting-main-page">
             <div className="basic-setting-one flex items-center gap-3">
@@ -266,7 +310,7 @@ const BasicSetting = () => {
                 <span> 1</span>
               </div>
               <div className="basic-setting-headin">
-                <h1>Basic settings</h1>
+                <h1>기본 설정</h1>
               </div>
               <div
                 className="last-basic flex items-center gap-2 justify-center"
@@ -284,11 +328,11 @@ const BasicSetting = () => {
 
             <div className="form-data ">
               <div className="">
-                <label>Campaign Name(30letter)</label>
+                <label>상품명</label>
                 <input
                   className="input-campaign-name w-full mt-4 h-[50px] px-4 rounded-[5px]"
                   type="text"
-                  placeholder="campaign name"
+                  placeholder="캠페인 이름 설정"
                   value={userData.campaignName}
                   onChange={(e) =>
                     setUserData({ ...userData, campaignName: e.target.value })
@@ -298,13 +342,15 @@ const BasicSetting = () => {
             </div>
             <div className="form-data ">
               <div className="form-input-group">
-                <label>Service</label>
-                <textarea name="Info" id="" rows={10}></textarea>
+                <label>서비스명</label>
+                <textarea name="Info" id="" rows={10} value={userData.service} onChange={(e) =>
+                    setUserData({ ...userData, service: e.target.value })
+                  }></textarea>
               </div>
             </div>
             <div className="form-data">
               <div className="form-input-group">
-                <label>Category</label>
+                <label>카테고리 설정</label>
                 <select
                   value={userData.category}
                   onChange={(e) =>
@@ -398,19 +444,20 @@ const BasicSetting = () => {
             {/* Time */}
             <div className="form-data flex">
               <div className="w-1/2 pr-2">
-                <label>Start Time</label>
+                <label>가능 시간</label>
                 <input
                   type="time"
                   value={userData.startTime}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setUserData({ ...userData, startTime: e.target.value })
-                  }
+                    console.log(e.target.value)
+                  }}
                   className="w-full mt-4 h-[50px] px-4 rounded-[5px]"
                 />
               </div>
 
               <div className="w-1/2 pl-2">
-                <label>End Time</label>
+                <label>~ 까지</label>
                 <input
                   type="time"
                   value={userData.endTime}
@@ -426,7 +473,7 @@ const BasicSetting = () => {
             <div className="form-data">
               <div className="flex justify-between">
                 <div className="form-input-group mt-12">
-                  <label>How many members</label>
+                  <label>신청 가능 인원수</label>
                   <div className="member-input">
                     <span
                       className="plus-minus-btn"
@@ -470,7 +517,7 @@ const BasicSetting = () => {
                 </div>
 
                 <div className="form-input-group mt-12">
-                  <label>(Optional) Points to give out</label>
+                  <label>(현재 불가능) 나눠줄 포인트 </label>
                   <div
                     className="zero-input"
                     style={{
@@ -483,6 +530,7 @@ const BasicSetting = () => {
                     </strong>
                     <input
                       type="number"
+                      disabled={true}
                       className="zero-input-number"
                       value={userData.points}
                       onChange={(e) =>
@@ -549,20 +597,20 @@ const BasicSetting = () => {
                   setUserData({ ...userData, campaignType: "visit" });
                 }}
               >
-                <h4>Visit</h4>
-                <p>Visit and reivew</p>
+                <h4>방문</h4>
+                <p>방문 후 리뷰</p>
               </div>
 
               <div
                 className={` ${activeVisit ? "ship" : "visti"}`}
-                onClick={() => {
-                  setActiveVisit(false);
-                  console.log(activeVisit);
-                  setUserData({ ...userData, campaignType: "ship" });
-                }}
+                // onClick={() => {
+                //   setActiveVisit(false);
+                //   console.log(activeVisit);
+                //   setUserData({ ...userData, campaignType: "ship" });
+                // }}
               >
-                <h4>Ship</h4>
-                <p>Get shipping and review</p>
+                <h4>배송</h4>
+                <p>배송 후 리뷰</p>
               </div>
             </div>
 
@@ -570,136 +618,32 @@ const BasicSetting = () => {
             {/* 나머지 주소 입력 */}
 
             {/* Drop */}
-            <div
-              className="drop"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
+
+            <ImageUploader
+            title="썸네일 이미지를 넣어주세요 (최대 3개)"
+            onClick={() => {handleImageClick(thumbnailInputRef)}}
+            files={thumbnailFiles}
+            inputRef={thumbnailInputRef}
+            onFileChange={(event) => handleMainFileChange(event,setThumbnailFiles, thumbnailFiles, setThumbnailPath, ThumbnailMaxFiles)}
+            multiple={true}
+            maxFiles={ThumbnailMaxFiles}
             >
-              <div className="Main-image">
-                <p>Thumbnail image </p>
-              </div>
-              <div className="drag-drop">
-                <div className="drag-drop-heading">
-                  <h2>Drag to upload</h2>
-                  <p>600x520px, 10mb 이하, jpg/png 권장</p>
-                </div>
-                <div
-                  className="upload"
-                  onClick={handleImageClick}
-                  style={{ cursor: "pointer" }}
-                >
-                  <img src={Plus} alt="Upload" />
-                </div>
-                <input
-                  type="file"
-                  multiple
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={handleFileChange}
-                />
-              </div>
-              <div
-                className="file-list"
-                style={{ marginTop: "20px", display: "flex", flexWrap: "wrap" }}
-              >
-                {files.map((file, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      background: "#f0f0f0",
-                      padding: "5px 10px",
-                      margin: "5px",
-                      borderRadius: "5px",
-                      position: "relative",
-                    }}
-                  >
-                    <span style={{ marginRight: "10px" }}>{file.name}</span>
-                    <button
-                      onClick={() => handleRemoveFile(index)}
-                      style={{
-                        background: "transparent",
-                        border: "none",
-                        color: "#ff6347",
-                        fontSize: "16px",
-                        cursor: "pointer",
-                        position: "absolute",
-                        top: "2px",
-                        right: "2px",
-                      }}
-                    >
-                      ✖
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div
-              className="drop"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
+
+            </ImageUploader>
+
+            <ImageUploader
+            title="상세 이미지를 넣어주세요 (최대 5개)"
+            onClick={() => {handleImageClick(mainInputRef)}}
+            files={mainFiles}
+            inputRef={mainInputRef}
+            onFileChange={(event) => handleMainFileChange(event,setMainFiles, mainFiles, setMainImagePaths, MainMaxFiles)}
+            multiple={true}
+            maxFiles={MainMaxFiles}
             >
-              <div className="Main-image">
-                <p>Main image (Max 5)</p>
-              </div>
-              <div className="drag-drop">
-                <div className="drag-drop-heading">
-                  <h2>Drag to upload</h2>
-                  <p>600x520px, 10mb 이하, jpg/png 권장</p>
-                </div>
-                <div
-                  className="upload"
-                  onClick={handleImageClick}
-                  style={{ cursor: "pointer" }}
-                >
-                  <img src={Plus} alt="Upload" />
-                </div>
-                <input
-                  type="file"
-                  multiple
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={handleFileChange}
-                />
-              </div>
-              <div
-                className="file-list"
-                style={{ marginTop: "20px", display: "flex", flexWrap: "wrap" }}
-              >
-                {files.map((file, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      background: "#f0f0f0",
-                      padding: "5px 10px",
-                      margin: "5px",
-                      borderRadius: "5px",
-                      position: "relative",
-                    }}
-                  >
-                    <span style={{ marginRight: "10px" }}>{file.name}</span>
-                    <button
-                      onClick={() => handleRemoveFile(index)}
-                      style={{
-                        background: "transparent",
-                        border: "none",
-                        color: "#ff6347",
-                        fontSize: "16px",
-                        cursor: "pointer",
-                        position: "absolute",
-                        top: "2px",
-                        right: "2px",
-                      }}
-                    >
-                      ✖
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+
+            </ImageUploader>
+
+           
 
             {/* text area  */}
             <div className="form-data ">
@@ -720,7 +664,7 @@ const BasicSetting = () => {
 
             <div className="form-data ">
               <div className="form-input-group">
-                <label>How to Register</label>
+                <label>신청 방법</label>
                 <textarea
                   name="How to Register"
                   id=""
@@ -736,7 +680,7 @@ const BasicSetting = () => {
 
             <div className="form-data ">
               <div className="form-input-group">
-                <label>Mission</label>
+                <label>미션</label>
                 <textarea
                   name="Mission"
                   value={fill.field3}
@@ -752,7 +696,7 @@ const BasicSetting = () => {
 
             <div className="form-data ">
               <div className="form-input-group">
-                <label>Keywords</label>
+                <label>키워드</label>
                 <textarea
                   name="Keywords"
                   value={fill.field4}
@@ -768,7 +712,7 @@ const BasicSetting = () => {
 
             <div className="form-data ">
               <div className="form-input-group">
-                <label>Aditional Info</label>
+                <label>추가 정보</label>
                 <textarea
                   name="Aditional Info"
                   value={fill.field5}
@@ -784,7 +728,7 @@ const BasicSetting = () => {
             {/* Adress to visit */}
             <div className="Adress_to_visit">
               <div className="address_to_visit_para">
-                <p>Adress to visit</p>
+                <p>업소 위치</p>
               </div>
               <div
                 className="address-one mt-3 px-5"
@@ -854,7 +798,7 @@ const BasicSetting = () => {
 
             {/* Chanel  youtube active insta inactive*/}
             <div className="chanel-social">
-              <h3>Chanel</h3>
+              <h3>흥보 채널</h3>
               <div className="flex justify-between mt-4">
                 <div
                   className={`${activeChanel.includes("youtube") ? "youtube" : "insta"
@@ -897,10 +841,10 @@ const BasicSetting = () => {
                 </div>
 
                 <div
-                  className={`${activeChanel.includes("etc") ? "youtube" : "insta"
+                  className={`${activeChanel.includes("tiktok") ? "youtube" : "insta"
                     }`}
                   onClick={() => {
-                    checkChanel("Tiktok");
+                    checkChanel("tiktok");
                   }}
                 >
                   Tiktok
@@ -932,4 +876,4 @@ const BasicSetting = () => {
   );
 };
 
-export default BasicSetting;
+export default AddCampaign;

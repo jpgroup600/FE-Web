@@ -69,9 +69,9 @@ const Navbar = () => {
   };
   return (
     <>
-      <nav className="2xl:px-12">
-        <div className="container mx-auto">
-          <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+      <nav className="w-full">
+        <div className="">
+          <div className="mx-auto">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 right-0 flex items-center lg:hidden">
                 <button

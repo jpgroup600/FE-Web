@@ -7,6 +7,7 @@ import { AuthContext } from "../App";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { AppProvider } from "../ContextApi/Api";
+import apiUrl from "../hooks/apiUrl";
 
 const Desktop17 = () => {
   const { userID, name, token, email } = useContext(AuthContext); // Access context values
@@ -20,13 +21,13 @@ const Desktop17 = () => {
   const scrollToMissionRef = useRef(null);
   const scrollToKeyWordRef = useRef(null);
   const scrollToAditionalRef = useRef(null);
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.post(
-          `https://webjacob-c0f6c8e947aa.herokuapp.com/new/getProd`,
+          `${apiUrl}/new/getProd`,
           {
             _id: id,
           }
@@ -178,23 +179,23 @@ const Desktop17 = () => {
   const [NewChannel, setNewChannel] = useState([]);
 
   const changeChanelName = (channel) => {
-    let text =  channel;
+    let text = channel;
     let newList = []
-    text?.map ((i) => {
-      if (i == "youtube"){
-            newList.push("유튜브");
-          }
-          if (i == "instagram"){
-            newList.push("인스타그램");
-          }
-          if (i == "blog"){
-            newList.push("블로그");
-          }
-          if (i == "tiktok"){
-            newList.push("틱톡");
-          }
-    }) 
-    
+    text?.map((i) => {
+      if (i == "youtube") {
+        newList.push("유튜브");
+      }
+      if (i == "instagram") {
+        newList.push("인스타그램");
+      }
+      if (i == "blog") {
+        newList.push("블로그");
+      }
+      if (i == "tiktok") {
+        newList.push("틱톡");
+      }
+    })
+
     console.log(newList);
   }
 
@@ -236,13 +237,23 @@ const Desktop17 = () => {
                 </h4>
                 <h5>Product Info</h5>
               </div>
-              <img src={product?.image || ""} alt="" className="mt-8 mb-9" />
+              {product?.image1
+                .slice(0, moreButton ? product.image1.length : 1)
+                .map((i, index) => (
+                  <img
+                    key={index}
+                    src={i}
+                    alt=""
+                    className="mt-8 mb-9"
+                  />
+                ))
+              }
               <div
                 className="brand-left-button"
                 onClick={() => setMoreButton(!moreButton)}
               >
                 <button className="flex">
-                  {moreButton ? "Less" : "More"}
+                  {moreButton ? "줄이기" : "더보기"}
                   <img src={Vector} alt="" className="mt-1" />
                 </button>
               </div>
@@ -323,7 +334,7 @@ const Desktop17 = () => {
                 <tr>
                   <td className="pt-3 pb-3 px-1">
                     <p
-                      onClick={scrollToChineseSection}
+                      onClick={() => {console.log(chineseSectionRef.current)}}
                       style={{ cursor: "pointer" }}
                     >
                       Info
@@ -389,7 +400,7 @@ const Desktop17 = () => {
                   <td colSpan={2}>
                     {isLoggedIn ? (
                       JSON.parse(localStorage.getItem("type")) ===
-                      "merchant" ? (
+                        "merchant" ? (
                         <button
                           onClick={() =>
                             alert(

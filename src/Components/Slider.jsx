@@ -10,14 +10,14 @@ const SliderContainer = () => {
     infinite: true,
     speed: 500,
     slidesToShow: 1,
-    slidesToScroll: 2,
+    slidesToScroll: 1,
     autoplay: true,
     fade: true,
     responsive: [
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 1,
           slidesToScroll: 1,
           infinite: true,
           dots: true,
@@ -55,7 +55,7 @@ const SliderContainer = () => {
           );
         });
         setSlides(bannerPaths);
-        console.log(bannerPaths);
+        console.log("배너 경로",bannerPaths);
       } catch (error) {
         console.error("Error fetching banners:", error);
       }
@@ -66,10 +66,9 @@ const SliderContainer = () => {
   return (
     <>
       <div
-        className="container    mx-auto mt-8 slider 2xl:px-12 px-12"
-        style={{ padding: "0 285px !importance" }}
+        className="slider mt-14"
       >
-        <Slider {...settings}>
+        <Slider {...settings} className="border-2 rounded-[20px]">
           {slideData.map((slide) => (
             <div key={slide}>
               <div

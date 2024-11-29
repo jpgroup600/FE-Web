@@ -3,7 +3,7 @@ import Category from '../Components/Category'
 import { AppProvider } from '../ContextApi/Api';
 import CampianData from './CampianData';
 
-const Campian = () => {
+const Campaign = () => {
   const {item} = useContext(AppProvider);
   return (
     <>
@@ -22,4 +22,4 @@ const Campian = () => {
   )
 }
 
-export default Campian
+export default Campaign

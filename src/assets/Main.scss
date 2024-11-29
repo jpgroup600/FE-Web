@@ -9,7 +9,7 @@
 }
 
 nav {
-  padding: 0 35px;
+  padding: 0 5%;
   background-color: 2px solid $lighWhite;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   .logo {
@@ -232,7 +232,7 @@ nav {
 
 // slider
 .slider {
-  height: 425px !important;
+  height: 450px !important;
   .slick-prev,
   .slick-next {
     position: absolute;
@@ -2182,4 +2182,63 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.add-campaign-container {
+    padding: 20px;
+    
+    .drop {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        
+        &:hover {
+            border-color: #999;
+        }
+    }
+
+    .Main-image {
+        margin-bottom: 15px;
+        
+        p {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+    }
+
+    .drag-drop {
+        text-align: center;
+        padding: 20px;
+        
+        &-heading {
+            margin-bottom: 15px;
+            
+            h2 {
+                font-size: 1.2rem;
+                margin-bottom: 5px;
+            }
+            
+            p {
+                color: #666;
+                font-size: 0.9rem;
+            }
+        }
+    }
+
+    .upload {
+        display: inline-block;
+        padding: 10px;
+        border-radius: 5px;
+        background: #f5f5f5;
+        
+        &:hover {
+            background: #eee;
+        }
+        
+        img {
+            width: 24px;
+            height: 24px;
+        }
+    }
 }

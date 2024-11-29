@@ -6,7 +6,7 @@ import Kakao from "../assets/images/Kakao.svg";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 
-const InfluencerForm = () => {
+const Signup2 = () => {
   const {
     register,
     handleSubmit,
@@ -244,4 +244,4 @@ const InfluencerForm = () => {
   );
 };
 
-export default InfluencerForm;
+export default Signup2;

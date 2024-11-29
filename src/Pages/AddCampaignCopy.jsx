@@ -1,0 +1,916 @@
+import React, { useEffect, useRef, useContext } from "react";
+import Plus from "../assets/images/plus.svg";
+import { useState } from "react";
+import { basicSettings } from "../Constants/ConstBasic";
+import DaumPostcode from "react-daum-postcode";
+import { AuthContext } from "../App"; // Import the context
+import axios from "axios";
+import ImageUploader from '../Components/ImageUploader';
+import apiUrl from "../hooks/apiUrl";
+
+const AddCampaign = () => {
+  const { email, token, userID } = useContext(AuthContext); // Access context values
+  const [uploadedImagesNew, setUploadedImagesNEw] = useState([]);
+  const [fill, setFill] = useState([]);
+  const [tabs, settabs] = useState([]);
+  const [thumbnailFiles, setThumbnailFiles] = useState([]);
+  const [mainFiles, setMainFiles] = useState([]);
+  const thumbnailInputRef = useRef(null);
+  const mainInputRef = useRef(null);
+  const [thumbnailPath, setThumbnailPath] = useState("");
+  const [mainImagePaths, setMainImagePaths] = useState([]);
+  // console.log(token, "token");
+  useEffect(() => {
+    const fetchHeads = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/final/getheadings`
+        );
+        if (!response.status == 200) {
+          throw new Error("Failed to fetch banners");
+        }
+
+        // console.log(response.data.headings[0]);
+
+        setFill(response.data.headings[0]);
+      } catch (error) {
+        console.error("Error fetching banners:", error);
+      }
+      try {
+        const response = await axios.get(
+          `${apiUrl}/final/getTabs`
+        );
+        if (!response.status == 200) {
+          throw new Error("Failed to fetch Tabs");
+        }
+
+        // console.log(response.data.tabs[0].stringsArray);
+        settabs(response.data.tabs[0].stringsArray);
+        // setFill(response.data.headings[0]);
+      } catch {
+        console.error("Error fetching Tabs:", error);
+      }
+    };
+
+    fetchHeads();
+  }, []);
+  const [files, setFiles] = useState([]);
+  const fileInputRef = useRef(null);
+
+  const uploadImages = async (fileArray) => {
+    const formData = new FormData();
+
+    fileArray.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}/images`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Images uploaded successfully:", response.data.files);
+      console.log("Uploaded Images:", response.data.files);
+      setUploadedImagesNEw(response.data.files);
+
+      console.log("FileNames in state", uploadedImagesNew);
+      // Handle the response data as needed here
+      return response.data;
+    } catch (error) {
+      console.error("Error uploading images:", error);
+    }
+  };
+  const formRef = useRef();
+  const handleReset = () => {
+    formRef.current.reset();
+  };
+  const [img, setimg] = useState([]);
+  useEffect(() => {
+    // console.log("Files in state useEffect", uploadedImagesNew);
+    setimg(uploadedImagesNew);
+  }, [uploadedImagesNew]);
+
+  const handleFileChange = async (event) => {
+    const selectedFiles = Array.from(event.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+
+    try {
+      const uploadedData = await uploadImages(selectedFiles);
+      console.log("Response after uploading:", uploadedData);
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+  const handleDrop = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const newFiles = Array.from(event.dataTransfer.files);
+    newFiles.forEach((file) => uploadImages(file));
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+
+  const handleRemoveFile = (indexToRemove) => {
+    setFiles((prevFiles) =>
+      prevFiles.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
+  const InputItems = {
+    width: "514px",
+    background: "transparent ",
+    border: "1px solid #ccc",
+  };
+
+  const basicInfo = {
+    marginTop: "170px",
+  };
+
+  const handleOpenModal = () => {
+    setModalState(false);
+  };
+
+  //check chanel state
+  const checkChanel = (input_chanel) => {
+    if (activeChanel.includes(input_chanel)) {
+      setActiveChanel(activeChanel.filter((chanel) => chanel !== input_chanel));
+      setUserData({
+        ...userData,
+        chanel: activeChanel.filter((chanel) => chanel !== input_chanel),
+      });
+    } else {
+      setActiveChanel([...activeChanel, input_chanel]);
+      setUserData({ ...userData, chanel: [...activeChanel, input_chanel] });
+    }
+  };
+
+  const checkWeek = (input_week) => {
+    if (activeWeek.includes(input_week)) {
+      setActiveWeek(activeWeek.filter((week) => week !== input_week));
+      setUserData({
+        ...userData,
+        week: activeWeek.filter((week) => week !== input_week),
+      });
+    } else {
+      setActiveWeek([...activeWeek, input_week]);
+      setUserData({ ...userData, week: [...activeWeek, input_week] });
+    }
+  };
+
+  // function for cheking daum map api
+  const onCompletePost = (data) => {
+    setModalState(false);
+    setUserData({
+      ...userData,
+      address: {
+        address: data.address,
+        sido: data.sido,
+        sigungu: data.sigungu,
+      },
+    });
+  };
+
+  useEffect(() => {
+    // console.log("UserId", localStorage.getItem("userID"));
+  });
+
+  const handleSubmit = async () => {
+    if (!userData.campaignName || !thumbnailPath) {
+      alert(
+        "Please fill in all required fields and upload at least one image."
+      );
+      return;
+    }
+
+    try {
+      const derivedData = {
+        userId: localStorage.getItem("userID"),
+        email,
+        campaignName: userData.campaignName,
+        isVisitOrShip: activeVisit ? "Visit" : "Ship",
+        location: `Sido: ${userData.address?.sido} | Sigungu: ${userData.address?.sigungu} | Address: ${userData.address?.address}`,
+        checkDay: activeWeek
+          .map((week) => week.charAt(0).toUpperCase() + week.slice(1))
+          .join(", "),
+        availableTime: `${userData.startTime} - ${userData.endTime}`,
+        numberOfPeople: userData.member,
+        image: userData.image,
+        textArea1: userData.Info,
+        textArea2: userData.howtoregister,
+        textArea3: userData.keywords,
+        textArea4: userData.aditionalinfo,
+        textArea5: "Additional details",
+        channel: activeChanel.join(", "),
+        image1: userData.image1 || "",
+        image2: userData.image2 || "",
+        image3: userData.image3 || "",
+        image4: userData.image4 || "",
+        image5: userData.image5 || "",
+        catagory: userData.catagory,
+      };
+      const response = await fetch(
+        "https://webjacob-c0f6c8e947aa.herokuapp.com/products/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(derivedData),
+        }
+      );
+
+      if (response.ok) {
+        alert("Added successfully");
+      } else {
+        alert("Failed to add campaign. Please check the data.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to perform operation: " + error);
+    }
+  };
+  const [modalState, setModalState] = useState(false);
+  const [test, settest] = useState(true);
+
+  const [activeVisit, setActiveVisit] = useState(false);
+  const [isCompaign, setIsCompaign] = useState(false);
+  const [activeChanel, setActiveChanel] = useState([]);
+  const [activeWeek, setActiveWeek] = useState([]);
+  const [userData, setUserData] = useState(basicSettings);
+  useEffect(() => {
+    // console.log(userData);
+  }, [userData]);
+
+  // Thumbnail handlers
+  const handleThumbnailClick = () => {
+    thumbnailInputRef.current.click();
+  };
+
+  const handleThumbnailFileChange = async (event) => {
+    const newFiles = Array.from(event.target.files);
+    setThumbnailFiles([...thumbnailFiles, ...newFiles]);
+
+    try {
+      const uploadedFiles = await uploadImages(newFiles);
+      console.log("uploadedFiles", uploadedFiles);
+      if (uploadedFiles && uploadedFiles.length > 0) {
+        setThumbnailPath(uploadedFiles[0].path);
+        setUserData({
+          ...userData,
+          image: `https://webjacob-c0f6c8e947aa.herokuapp.com/${uploadedFiles[0].files[0].path}`
+        });
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
+
+  const handleRemoveThumbnail = (index) => {
+    setThumbnailFiles(thumbnailFiles.filter((_, i) => i !== index));
+  };
+
+  // Main image handlers
+  const handleMainImageClick = () => {
+    mainInputRef.current.click();
+  };
+
+  const handleMainFileChange = async (event) => {
+    const newFiles = Array.from(event.target.files);
+    if (mainFiles.length + newFiles.length <= 5) {
+        setMainFiles([...mainFiles, ...newFiles]);
+
+        try {
+            const uploadedFiles = await uploadImages(newFiles);
+            console.log("uploadedFiles", uploadedFiles);
+            if (uploadedFiles && uploadedFiles.files) {  // Check for files property
+                const newPaths = uploadedFiles.files.map(file => file.path);  // Access the files array
+                setMainImagePaths(prev => [...prev, ...newPaths]);
+                
+                // Update userData with image paths
+                const imageFields = ['image1', 'image2', 'image3', 'image4', 'image5'];
+                const updatedUserData = { ...userData };
+                newPaths.forEach((path, index) => {
+                    if (index < 5) {
+                        updatedUserData[imageFields[index]] = 
+                            `https://webjacob-c0f6c8e947aa.herokuapp.com/${path}`;
+                    }
+                });
+                setUserData(updatedUserData);
+            }
+        } catch (error) {
+            console.error("Upload failed:", error);
+        }
+    } else {
+        alert('Maximum 5 images allowed');
+    }
+  };
+
+  const handleRemoveMainFile = (index) => {
+    setMainFiles(mainFiles.filter((_, i) => i !== index));
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleThumbnailDrop = (e) => {
+    e.preventDefault();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    setThumbnailFiles([...thumbnailFiles, ...droppedFiles]);
+  };
+
+  const handleMainDrop = (e) => {
+    e.preventDefault();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    if (mainFiles.length + droppedFiles.length <= 5) {
+      setMainFiles([...mainFiles, ...droppedFiles]);
+    } else {
+      alert('Maximum 5 images allowed');
+    }
+  };
+
+  return (
+    <>
+      <div className="container mt-5 basic-campian-section 2xl:px-12 lg:px-5">
+        <div className=" 2xl:px-12">
+          <div className="basic-setting 2xl:px-12 lg:px-0">
+            <h2>Campagin</h2>
+            <button className="bring-prev">Bring prev campaign</button>
+            <button className="reset">reset</button>
+          </div>
+          <div className="basic-setting-main-page">
+            <div className="basic-setting-one flex items-center gap-3">
+              <div className="one">
+                <span> 1</span>
+              </div>
+              <div className="basic-setting-headin">
+                <h1>Basic settings</h1>
+              </div>
+              <div
+                className="last-basic flex items-center gap-2 justify-center"
+                style={{
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                  wordWrap: "break-word",
+                  maxWidth: "none",
+                  width: "auto",
+                }}
+              >
+                <p>필수</p>
+              </div>
+            </div>
+
+            <div className="form-data ">
+              <div className="">
+                <label>Campaign Name(30letter)</label>
+                <input
+                  className="input-campaign-name w-full mt-4 h-[50px] px-4 rounded-[5px]"
+                  type="text"
+                  placeholder="campaign name"
+                  value={userData.campaignName}
+                  onChange={(e) =>
+                    setUserData({ ...userData, campaignName: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="form-data ">
+              <div className="form-input-group">
+                <label>Service</label>
+                <textarea name="Info" id="" rows={10}></textarea>
+              </div>
+            </div>
+            <div className="form-data">
+              <div className="form-input-group">
+                <label>Category</label>
+                <select
+                  value={userData.category}
+                  onChange={(e) =>
+                    setUserData({ ...userData, catagory: e.target.value })
+                  }
+                  className="w-full mt-4 h-[50px] px-4 rounded-[5px]"
+                >
+                  {tabs.map((category) => (
+                    <option value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            {/* Monday friday*/}
+
+            <div className="chanel-social">
+              <h3>가능한 요일</h3>
+              <div className="flex justify-between mt-4">
+                <div
+                  className={`${activeWeek.includes("mon") ? "weekend-active" : "weekend"
+                    }`}
+                  onClick={() => {
+                    checkWeek("mon");
+                  }}
+                >
+                  Monday
+                </div>
+
+                <div
+                  className={`${activeWeek.includes("tue") ? "weekend-active" : "weekend"
+                    }`}
+                  onClick={() => {
+                    checkWeek("tue");
+                  }}
+                >
+                  Tuesday
+                </div>
+
+                <div
+                  className={`${activeWeek.includes("wen") ? "weekend-active" : "weekend"
+                    }`}
+                  onClick={() => {
+                    checkWeek("wen");
+                  }}
+                >
+                  Wednesday
+                </div>
+
+                <div
+                  className={`${activeWeek.includes("thur") ? "weekend-active" : "weekend"
+                    }`}
+                  onClick={() => {
+                    checkWeek("thur");
+                  }}
+                >
+                  Thursday
+                </div>
+
+                <div
+                  className={`${activeWeek.includes("fri") ? "weekend-active" : "weekend"
+                    }`}
+                  onClick={() => {
+                    checkWeek("fri");
+                  }}
+                >
+                  Friday
+                </div>
+
+                <div
+                  className={`${activeWeek.includes("sat") ? "weekend-active" : "weekend"
+                    }`}
+                  onClick={() => {
+                    checkWeek("sat");
+                  }}
+                >
+                  Saturday
+                </div>
+
+                <div
+                  className={`${activeWeek.includes("sun") ? "weekend-active" : "weekend"
+                    }`}
+                  onClick={() => {
+                    checkWeek("sun");
+                  }}
+                >
+                  Sunday
+                </div>
+              </div>
+            </div>
+
+            {/* Time */}
+            <div className="form-data flex">
+              <div className="w-1/2 pr-2">
+                <label>Start Time</label>
+                <input
+                  type="time"
+                  value={userData.startTime}
+                  onChange={(e) =>
+                    setUserData({ ...userData, startTime: e.target.value })
+                  }
+                  className="w-full mt-4 h-[50px] px-4 rounded-[5px]"
+                />
+              </div>
+
+              <div className="w-1/2 pl-2">
+                <label>End Time</label>
+                <input
+                  type="time"
+                  value={userData.endTime}
+                  onChange={(e) =>
+                    setUserData({ ...userData, endTime: e.target.value })
+                  }
+                  className="w-full mt-4 h-[50px] px-4 rounded-[5px]"
+                />
+              </div>
+            </div>
+
+            {/* how many membmers */}
+            <div className="form-data">
+              <div className="flex justify-between">
+                <div className="form-input-group mt-12">
+                  <label>How many members</label>
+                  <div className="member-input">
+                    <span
+                      className="plus-minus-btn"
+                      onClick={() => {
+                        if (userData.member > 1) {
+                          setUserData({
+                            ...userData,
+                            member: userData.member - 1,
+                          });
+                        }
+                      }}
+                      style={{
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        color: "black",
+                      }}
+                    >
+                      -
+                    </span>
+                    <p>{userData.member}</p>
+                    <span
+                      className="plus-minus-btn"
+                      onClick={() => {
+                        if (userData.member < 100) {
+                          setUserData({
+                            ...userData,
+                            member: userData.member + 1,
+                          });
+                        }
+                      }}
+                      style={{
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        color: "black",
+                      }} // Adjust font size as desired
+                    >
+                      +
+                    </span>
+                  </div>
+                  <span className="mt-2">range of 1~100</span>
+                </div>
+
+                <div className="form-input-group mt-12">
+                  <label>(Optional) Points to give out</label>
+                  <div
+                    className="zero-input"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <strong style={{ color: "#9E9E9E", marginRight: "8px" }}>
+                      0
+                    </strong>
+                    <input
+                      type="number"
+                      className="zero-input-number"
+                      value={userData.points}
+                      onChange={(e) =>
+                        setUserData({ ...userData, points: e.target.value })
+                      }
+                      style={{
+                        width: "60px",
+                        padding: "5px",
+                        textAlign: "center",
+                      }}
+                    />
+                    <strong style={{ marginLeft: "8px" }}>p</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* basic */}
+            <div
+              style={{ marginTop: "10%" }}
+              className="basic-setting-one flex items-start gap-3"
+            >
+              <div className="one">
+                <span> 2</span>
+              </div>
+
+              <div className="basic-setting-headin flex flex-col">
+                <h1 className="font-bold">Campaign info</h1>
+                <h3
+                  style={{
+                    fontWeight: 400,
+                    marginTop: "25%",
+                    marginLeft: "-25%",
+                  }}
+                  className="font-bold"
+                >
+                  Campaign info2
+                </h3>
+              </div>
+
+              <div
+                className="last-basic flex items-center gap-2 justify-center"
+                style={{
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                  wordWrap: "break-word",
+                  maxWidth: "none",
+                  width: "auto",
+                  marginTop: 10,
+                }}
+              >
+                <p>필수</p>
+              </div>
+            </div>
+
+            {/* Visit */}
+
+            <div className="flex justify-between">
+              <div
+                className={` ${activeVisit ? "visti" : "ship"}`}
+                onClick={() => {
+                  setActiveVisit(true);
+                  console.log(activeVisit);
+                  setUserData({ ...userData, campaignType: "visit" });
+                }}
+              >
+                <h4>Visit</h4>
+                <p>Visit and reivew</p>
+              </div>
+
+              <div
+                className={` ${activeVisit ? "ship" : "visti"}`}
+                onClick={() => {
+                  setActiveVisit(false);
+                  console.log(activeVisit);
+                  setUserData({ ...userData, campaignType: "ship" });
+                }}
+              >
+                <h4>Ship</h4>
+                <p>Get shipping and review</p>
+              </div>
+            </div>
+
+
+            {/* 나머지 주소 입력 */}
+
+            {/* Drop */}
+            <ImageUploader
+                title="Thumbnail image"
+                files={thumbnailFiles}
+                onFileChange={handleThumbnailFileChange}
+                onRemoveFile={handleRemoveThumbnail}
+                inputRef={thumbnailInputRef}
+                onClick={handleThumbnailClick}
+                onDrop={handleThumbnailDrop}
+            />
+
+            {/* Main Images Uploader */}
+            <ImageUploader
+                title="Main image (Max 5)"
+                files={mainFiles}
+                onFileChange={handleMainFileChange}
+                onRemoveFile={handleRemoveMainFile}
+                inputRef={mainInputRef}
+                onClick={handleMainImageClick}
+                onDrop={handleMainDrop}
+                multiple={true}
+                maxFiles={5}
+            />
+
+            {/* text area  */}
+            <div className="form-data ">
+              <div className="form-input-group">
+                <label>Info</label>
+                <textarea
+                  value={fill.field1}
+                  name="Info"
+                  id=""
+                  rows={10}
+                  onChange={(e) => {
+                    setFill({ ...fill, field1: e.target.value });
+                    setUserData({ ...userData, Info: e.target.value });
+                  }}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="form-data ">
+              <div className="form-input-group">
+                <label>How to Register</label>
+                <textarea
+                  name="How to Register"
+                  id=""
+                  rows={10}
+                  value={fill.field2}
+                  onChange={(e) => {
+                    setFill({ ...fill, field2: e.target.value });
+                    setUserData({ ...userData, howtoregister: e.target.value });
+                  }}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="form-data ">
+              <div className="form-input-group">
+                <label>Mission</label>
+                <textarea
+                  name="Mission"
+                  value={fill.field3}
+                  id=""
+                  rows={10}
+                  onChange={(e) => {
+                    setFill({ ...fill, field3: e.target.value });
+                    setUserData({ ...userData, mission: e.target.value });
+                  }}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="form-data ">
+              <div className="form-input-group">
+                <label>Keywords</label>
+                <textarea
+                  name="Keywords"
+                  value={fill.field4}
+                  id=""
+                  rows={10}
+                  onChange={(e) => {
+                    setFill({ ...fill, field4: e.target.value });
+                    setUserData({ ...userData, keywords: e.target.value });
+                  }}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="form-data ">
+              <div className="form-input-group">
+                <label>Aditional Info</label>
+                <textarea
+                  name="Aditional Info"
+                  value={fill.field5}
+                  id=""
+                  rows={10}
+                  onChange={(e) => {
+                    setFill({ ...fill, field5: e.target.value });
+                    setUserData({ ...userData, aditionalinfo: e.target.value });
+                  }}
+                ></textarea>
+              </div>
+            </div>
+            {/* Adress to visit */}
+            <div className="Adress_to_visit">
+              <div className="address_to_visit_para">
+                <p>Adress to visit</p>
+              </div>
+              <div
+                className="address-one mt-3 px-5"
+                onClick={() => {
+                  setModalState(true);
+                }}
+              >
+                <span style={{ color: "#9E9E9E" }}>
+                  {userData.address.address
+                    ? userData.address.address
+                    : "주소 설정"}
+                </span>
+                <span>| {"    "}주소 검색</span>
+                {modalState && (
+                  <div className="modal">
+                    <div
+                      style={{
+                        position: "relative",
+                        width: "400px",
+                        height: "500px",
+                      }}
+                    >
+                      <DaumPostcode
+                        autoClose={true}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                        onComplete={onCompletePost}
+                      />
+                      <button
+                        onClick={handleOpenModal}
+                        style={{
+                          marginTop: "10px",
+                          padding: "8px 16px",
+                          backgroundColor: "#f00",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                          display: "block",
+                          width: "100%",
+                        }}
+                      >
+                        <div> </div>
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <input
+              type="text"
+              placeholder="나머지 주소 입력"
+              className="last-container mt-2"
+              onChange={(e) => {
+                setUserData({
+                  ...userData,
+                  address: {
+                    ...userData.address,
+                    detailAddress: e.target.value,
+                  },
+                });
+              }}
+            ></input>
+
+            {/* Chanel  youtube active insta inactive*/}
+            <div className="chanel-social">
+              <h3>Chanel</h3>
+              <div className="flex justify-between mt-4">
+                <div
+                  className={`${activeChanel.includes("youtube") ? "youtube" : "insta"
+                    }`}
+                  onClick={() => {
+                    checkChanel("youtube");
+                  }}
+                >
+                  Youtube
+                </div>
+
+                <div
+                  className={`${activeChanel.includes("instagram") ? "youtube" : "insta"
+                    }`}
+                  onClick={() => {
+                    checkChanel("instagram");
+                  }}
+                >
+                  instagram
+                </div>
+
+                <div
+                  className={`${activeChanel.includes("blog") ? "youtube" : "insta"
+                    }`}
+                  onClick={() => {
+                    checkChanel("blog");
+                  }}
+                >
+                  Blog
+                </div>
+
+                <div
+                  className={`${activeChanel.includes("web") ? "youtube" : "insta"
+                    }`}
+                  onClick={() => {
+                    checkChanel("web");
+                  }}
+                >
+                  Web
+                </div>
+
+                <div
+                  className={`${activeChanel.includes("etc") ? "youtube" : "insta"
+                    }`}
+                  onClick={() => {
+                    checkChanel("Tiktok");
+                  }}
+                >
+                  Tiktok
+                </div>
+              </div>
+            </div>
+
+            {/* End */}
+          </div>
+        </div>
+        <div
+          className="2xl:px-12  mt-10 mb-12"
+          style={{ paddingBottom: "90px" }}
+        >
+          <div className="flex justify-between max-w-[1220px] mx-auto ">
+            <div className="bottom-btn-one cursor-pointer ">
+              <p>캠페인 미리보기</p>
+            </div>
+            <div
+              className="bottom-btn-two cursor-pointer	"
+              onClick={handleSubmit}
+            >
+              <p>캠페인 등록하기</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default AddCampaign;

@@ -99,7 +99,7 @@ const Login = () => {
 
   const [activeTab, setActiveTab] = useState("reviewer");
   return (
-    <div>
+    <div className="mb-[50vh]">
       <div className="h-[50vh] flex items-center justify-center">
         <div className="login-form mx-auto">
           <div className="login-log">
