@@ -164,16 +164,23 @@ const Navbar = () => {
                       onClick={toggleDropdown}
                       className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
                     >
+                      <div className="absolute text-white left-[0px] bg-red-500 rounded-[100px] w-5 h-5 text-[0.8em] flex items-center justify-center">
+                        {notificationreal.length}
+                      </div>
                       알림
                     </NavLink>
                     {isOpen && (
+                      
                       <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-4">
+                        
                         <div className="max-h-80 overflow-y-auto space-y-3">
-                          {notificationreal.slice(0, 5).map((notification) => (
+                          {notificationreal.map((notification) => (
+                            
                             <div
                               key={notification.id}
                               className="notification-item bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200 hover:bg-gray-100 transition-all duration-200 ease-in-out"
                             >
+                              
                               <p className="text-gray-800 font-medium text-sm">
                                 {notification.message}
                               </p>
