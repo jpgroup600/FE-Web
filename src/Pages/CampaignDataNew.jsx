@@ -34,14 +34,10 @@ const CampianDataNew = ({ search }) => {
 
     if (search) {
       const filteredItems = items.filter((item) => {
-        const location = item.location || ""; // Ensure we handle null/undefined cases
-        const locationParts = location.split(" | ");
+        
 
         // Assuming "Sido: 서울" is the first part
-        const sido = locationParts
-          .find((part) => part.startsWith("Sido:"))
-          ?.split(":")[1]
-          ?.trim();
+        const sido = item?.location?.sido
 
         // Check if the Sido matches the search term (case-insensitive)
         const isLocationMatch =

@@ -8,6 +8,8 @@ import axios from "axios";
 import ImageUploader from "../Components/ImageUploader";
 import apiUrl from "../hooks/apiUrl";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
 
 const AddCampaign = () => {
   const { email, token, userID } = useContext(AuthContext); // Access context values
@@ -65,7 +67,7 @@ const AddCampaign = () => {
     const fetchHeads = async () => {
       try {
         const response = await axios.get(
-          "https://webjacob-c0f6c8e947aa.herokuapp.com/final/getheadings"
+          `${apiUrl}/final/getheadings`
         );
         if (!response.status == 200) {
           throw new Error("Failed to fetch banners");
@@ -79,7 +81,7 @@ const AddCampaign = () => {
       }
       try {
         const response = await axios.get(
-          "https://webjacob-c0f6c8e947aa.herokuapp.com/final/getTabs"
+          `${apiUrl}/final/getTabs`
         );
         if (!response.status == 200) {
           throw new Error("Failed to fetch Tabs");
@@ -238,12 +240,11 @@ const AddCampaign = () => {
 
     try {
       const derivedData = {
-        userId: localStorage.getItem("userID"),
         service:userData.service,
         email,
         campaignName: userData.campaignName,
         isVisitOrShip: activeVisit ? "Visit" : "Ship",
-        location: `Sido: ${userData.address?.sido} | Sigungu: ${userData.address?.sigungu} | Address: ${userData.address?.address}`,
+        location: userData.address,
         checkDay: activeWeek
           .map((week) => week.charAt(0).toUpperCase() + week.slice(1))
           .join(", "),
@@ -259,6 +260,7 @@ const AddCampaign = () => {
         channel: activeChanel.join(", "),
         image1: mainImagePaths || " ",
         catagory: userData.catagory,
+        token: localStorage.getItem("token")
       };
       const response = await fetch(
         "https://webjacob-c0f6c8e947aa.herokuapp.com/products/add",
@@ -650,7 +652,7 @@ const AddCampaign = () => {
               <div className="form-input-group">
                 <label>Info</label>
                 <textarea
-                  value={fill.field1}
+                  value={fill?.field1}
                   name="Info"
                   id=""
                   rows={10}
@@ -669,7 +671,7 @@ const AddCampaign = () => {
                   name="How to Register"
                   id=""
                   rows={10}
-                  value={fill.field2}
+                  value={fill?.field2}
                   onChange={(e) => {
                     setFill({ ...fill, field2: e.target.value });
                     setUserData({ ...userData, howtoregister: e.target.value });
@@ -683,7 +685,7 @@ const AddCampaign = () => {
                 <label>미션</label>
                 <textarea
                   name="Mission"
-                  value={fill.field3}
+                  value={fill?.field3}
                   id=""
                   rows={10}
                   onChange={(e) => {
@@ -699,7 +701,7 @@ const AddCampaign = () => {
                 <label>키워드</label>
                 <textarea
                   name="Keywords"
-                  value={fill.field4}
+                  value={fill?.field4}
                   id=""
                   rows={10}
                   onChange={(e) => {
@@ -715,7 +717,7 @@ const AddCampaign = () => {
                 <label>추가 정보</label>
                 <textarea
                   name="Aditional Info"
-                  value={fill.field5}
+                  value={fill?.field5}
                   id=""
                   rows={10}
                   onChange={(e) => {

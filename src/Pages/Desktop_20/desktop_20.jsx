@@ -87,30 +87,20 @@ const FilterProducts = () => {
           </div>
           <div className="filter-boxes">
             <div className="grid lg:grid-cols-10 gap-4">
-              {filteredCampaigns
-                .map((item) => {
-                  const location = item.location || ""; // handle null/undefined cases
-                  const locationParts = location.split(" | ");
-
-                  // Extract Sido (the first part)
-                  const sido = locationParts
-                    .find((part) => part.startsWith("Sido:"))
-                    ?.split(":")[1]
-                    ?.trim();
-
-                  return sido; // Return the 'sido' value
-                })
-                .filter((value, index, self) => self.indexOf(value) === index) // Filter out duplicates
-                .map((sido, index) => {
-                  if (!sido) return null; // If there's no 'sido', don't render the button
-                  return (
-                    <div key={index} className="box">
-                      <button onClick={() => handleClick(sido)}>
-                        {sido} {/* Only show Sido */}
-                      </button>
-                    </div>
-                  );
-                })}
+              {filteredCampaigns?.reduce((unique, item) => {
+                const sido = item?.location?.sido;
+                if (sido && !unique.includes(sido)) {
+                  unique.push(sido);
+                }
+                return unique;
+              }, [])
+                .map((sido, index) => (
+                  <div key={index} className="box">
+                    <button onClick={() => handleClick(sido)}>
+                      {sido}
+                    </button>
+                  </div>
+                ))}
             </div>
           </div>
 

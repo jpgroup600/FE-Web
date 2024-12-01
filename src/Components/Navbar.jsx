@@ -51,11 +51,12 @@ const Navbar = () => {
         .post(
           "https://webjacob-c0f6c8e947aa.herokuapp.com/final/myNotifications",
           {
-            userId: userID,
+            userId: email,
           }
         )
         .then((response) => {
           setNotifications(response.data);
+          console.log("notificationreal", response.data);
         })
         .catch((error) => {
           console.error("Error fetching notifications:", error);
@@ -193,10 +194,10 @@ const Navbar = () => {
                   {name ? (
                     <>
                       <button
-                        className="font-medium Login w-100"
+                        className="font-medium px-6 py-2 rounded-[10px] bg-[#2C9512] text-white"
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                       >
-                        Profile
+                        설정
                       </button>
 
                       {isDropdownOpen && (
@@ -217,8 +218,8 @@ const Navbar = () => {
                         >
                           <Link
                             to={
-                              JSON.parse(localStorage.getItem("type")) ===
-                              "individual"
+                              localStorage.getItem("userType") ===
+                              "influencer"
                                 ? "/user"
                                 : "/merchant"
                             }
@@ -231,7 +232,7 @@ const Navbar = () => {
                             }}
                             onClick={() => setIsDropdownOpen(false)}
                           >
-                            Profile
+                            프로필
                           </Link>
 
                           <button

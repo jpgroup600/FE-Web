@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import Review from "../assets/images/Review.svg";
 import Merchant from "../assets/images/Merchant.svg";
 import NewverLogin from "../assets/images/NeverLogin.svg";
@@ -10,11 +10,9 @@ import Insta from "../assets/images/insta.svg";
 import Youtube from "../assets/images/youtube.svg";
 import Tiktok from "../assets/images/Tiktok.svg";
 import More from "../assets/images/more.svg";
-import apiUrl from "../hooks/apiUrl";
 
-const Signup2 = () => {
+const SignUp3 = () => {
   const [selectedGender, setSelectedGender] = useState(null);
-  const [userInfo, setUserInfo] = useState({});
 
   const [activeIndex, setActiveIndex] = useState({});
 
@@ -41,17 +39,13 @@ const Signup2 = () => {
       name: data.name,
       email: data.email,
       password: data.password,
-      phoneNumber: data.phoneNumber,
+      PhoneNumber: data.phoneNumber,
       birthDate: data.birthdate,
-      gender: selectedGender,
-      influenceType: activeIndex,
-      userType : "influencer"
-
     };
-// `${apiUrl}/merchant/signup`
+
     try {
       const response = await fetch(
-        `${apiUrl}/auth/signup`,
+        "https://webjacob-c0f6c8e947aa.herokuapp.com/merchant/signup",
         {
           method: "POST",
           headers: {
@@ -80,11 +74,6 @@ const Signup2 = () => {
       alert("Sign Up Failed" + error);
     }
   };
-
-  useEffect(() => {
-    console.log(userInfo);
-    console.log(selectedGender);
-  }, [userInfo,selectedGender]);
 
   return (
     <>
@@ -234,7 +223,7 @@ const Signup2 = () => {
               </div>
 
               <label htmlFor="" className="block">
-                흥보할 SNS 채널 주소
+                네이버 플레이스 or 홈페이지 주소 URL
               </label>
               
               {Object.keys(activeIndex).map((index) => (
@@ -324,4 +313,4 @@ const Signup2 = () => {
   );
 };
 
-export default Signup2;
+export default SignUp3;

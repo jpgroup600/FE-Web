@@ -47,6 +47,9 @@ const LoginAsMerchant = () => {
         localStorage.setItem("email", result.email);
         localStorage.setItem("token", result.jwtToken);
         localStorage.setItem("userID", result._id);
+        localStorage.setItem("type", result.userType);
+        localStorage.setItem("businessName", result.businessName);
+
         const r = await fetch(
           "https://webjacob-c0f6c8e947aa.herokuapp.com/auth/find-email",
           {

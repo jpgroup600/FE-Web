@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import Login from './Pages/Login';
@@ -20,6 +20,8 @@ import EventNotificationsPage from './Pages/Event_NotificationsPage';
 import UnderDev from './Pages/UnderDev';
 import HomeScreen from './Pages/HomeScreen';
 import ViewProduct from './Pages/ViewProduct';
+import MerchantPage from './Pages/MerchantPage';
+import UserPage from './Pages/UserPage';
 
 // Create the context here in the same file
 export const AuthContext = createContext();
@@ -30,6 +32,21 @@ const App = () => {
   const [email, setEmail] = useState( localStorage.getItem('email') || '');
   const [name, setname] = useState(localStorage.getItem('name')|| '');
   const [userID, setUserID] = useState(localStorage.getItem('userID') || '');
+
+  useEffect(() => {
+    console.log("LocalStorage contents:", {
+        name: localStorage.getItem("name"),
+        email: localStorage.getItem("email"),
+        token: localStorage.getItem("token"),
+        userID: localStorage.getItem("userID"),
+        type: localStorage.getItem("type"),
+        businessName: localStorage.getItem("businessName"),
+        influenceType: localStorage.getItem("influenceType"),
+        phoneNumber: localStorage.getItem("phoneNumber"),
+        userType: localStorage.getItem("userType")
+    });
+}, []);
+
   return (
     <AuthContext.Provider value={{ token, setToken, email, setEmail, name, setname, userID, setUserID }}>
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', overflowX: 'hidden'}}>
@@ -41,8 +58,9 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/campaign" element={<Campaign />} />
           <Route path="/add/campian" element={<AddCampaign />} />
-          <Route path="/merchant" element={<Merchant />} />
-          <Route path="/user" element={<User />} />
+          {/* <Route path="/merchantpage" element={<Merchant />} /> */}
+          <Route path="/merchant" element={<MerchantPage />} />
+          <Route path="/user" element={<UserPage />} />
           <Route path="/view/:id" element={<Desktop17 />} />
           <Route path="/view-product/:id" element={<ViewProduct/>} />
           <Route path="/signup2" element={<Signup2/>} />

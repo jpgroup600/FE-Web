@@ -66,7 +66,11 @@ const Login = () => {
         localStorage.setItem("email", result.email);
         localStorage.setItem("token", result.jwtToken);
         localStorage.setItem("userID", result._id);
-
+        localStorage.setItem("type", result.userType);
+        localStorage.setItem("phoneNumber", result.phoneNumber);
+        let influenceType = JSON.stringify(result.influenceType);
+        localStorage.setItem('influenceType', influenceType);
+        localStorage.setItem("userType", result.userType);
         // Fetch the user type based on email
         const r = await fetch(
           "https://webjacob-c0f6c8e947aa.herokuapp.com/auth/find-email",
@@ -111,7 +115,9 @@ const Login = () => {
               <div
                 className={`review-section flex items-center justify-center w-1/2 p-4 cursor-pointer ${activeTab === "reviewer" ? "" : "bg-gray-100"
                   }`}
-                onClick={() => setActiveTab("reviewer")}
+                onClick={() => {
+                  setActiveTab("reviewer")
+                }}
                 style={{ borderTopLeftRadius: 20 }}
               >
                 <img

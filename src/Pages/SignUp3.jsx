@@ -1,29 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import Review from "../assets/images/Review.svg";
 import Merchant from "../assets/images/Merchant.svg";
 import NewverLogin from "../assets/images/NeverLogin.svg";
 import Kakao from "../assets/images/Kakao.svg";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import Blog from "../assets/images/blogs.svg";
-import Insta from "../assets/images/insta.svg";
-import Youtube from "../assets/images/youtube.svg";
-import Tiktok from "../assets/images/Tiktok.svg";
-import More from "../assets/images/more.svg";
+import apiUrl from "../hooks/apiUrl";
 
 const SignUp3 = () => {
-  const [selectedGender, setSelectedGender] = useState(null);
-
-  const [activeIndex, setActiveIndex] = useState({});
-
-  const icons = [
-    { src: Blog, alt: "Blog" },
-    { src: Insta, alt: "Instagram" },
-    { src: Youtube, alt: "YouTube" },
-    { src: Tiktok, alt: "TikTok" },
-    { src: More, alt: "More" },
-  ];
-
   const {
     register,
     handleSubmit,
@@ -33,19 +17,20 @@ const SignUp3 = () => {
   const Navgation = useNavigate();
 
   const onSubmit = async (data) => {
-    console.log("Sedning data: ", JSON.stringify(data));
-
     const sent = {
       name: data.name,
       email: data.email,
       password: data.password,
       PhoneNumber: data.phoneNumber,
-      birthDate: data.birthdate,
+      businessName: data.businessName,
+      urladdress: data.address,
+      signupPath: data.signupPath,
+      userType : "merchant"
     };
-
+    console.log("sent", sent);
     try {
       const response = await fetch(
-        "https://webjacob-c0f6c8e947aa.herokuapp.com/merchant/signup",
+        `${apiUrl}/merchant/signup`,
         {
           method: "POST",
           headers: {
@@ -57,21 +42,21 @@ const SignUp3 = () => {
 
       if (response.status == 201) {
         const result = await response.json();
-        alert("Sign Up successfully");
+        console.log("SignUp REsponse", result);
         Navgation("/login");
-        console.log("Signup successful:", result);
-        return;
-      }
-      if (response.status == 409) {
-        alert("User Already Exists");
+        alert("Sign Up Successful!");
         return;
       } else {
-        alert("Sign up failed");
+        if (response.status == 409) {
+          alert("Signup failed user already exist");
+          return;
+        }
+        alert("Signup failed please fill fields correctly!");
+        console.log(sent, "sent......");
         return;
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Sign Up Failed" + error);
+      alert("Error:", error);
     }
   };
 
@@ -80,7 +65,7 @@ const SignUp3 = () => {
       <div className="container mx-auto">
         <div className="singup-container">
           <div className="singup-heading">
-            <h1>인플루언서 회원가입</h1>
+            <h1>개인/법인 사업자 회원가입</h1>
           </div>
           <div className="singup-form-container">
             <form action="" onSubmit={handleSubmit(onSubmit)}>
@@ -132,116 +117,53 @@ const SignUp3 = () => {
                     {...register("phoneNumber", { required: true })}
                     style={{ width: "256px", height: "38px" }}
                   />
-                   <div
+                  <button
                     className="border text-black px-4 py-2 rounded-[5px] text-sm cursor-pointer text-center"
                     style={{ width: "123px", height: "40px" }}
                   >
                     인증번호 받기
-                  </div>
+                  </button>
                 </div>
-                
+                <p className="message">휴대폰 인증을 진행해 주세요.</p>
               </div>
-              <p className="message">휴대폰 인증을 진행해 주세요.</p>
-              {/* Birthdate and Gender */}
-              <div className="birthandgender flex gap-3">
-                <div className="birthday">
-                  <label htmlFor="birthdate">생년월일</label>
-                  <input
-                    type="date"
-                    {...register("birthdate")}
-                    placeholder="1996.12.03"
-                    className="calender pr-2"
-                  />
-                </div>
-                <div className="gender">
-                  <label htmlFor="gender">성별</label>
-
-                  <div className="flex items-center">
-                    <label
-                      htmlFor="female"
-                      className={`flex items-center justify-center border rounded-lg w-20 h-10 cursor-pointer male ${
-                        selectedGender === "female"
-                          ? "border-blue-500 bg-blue-100"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      <input
-                        id="female"
-                        type="radio"
-                        value="female"
-                        checked={selectedGender === "female"}
-                        onChange={() => setSelectedGender("female")}
-                        className="hidden"
-                      />
-                      여
-                    </label>
-
-                    <label
-                      htmlFor="male"
-                      className={`flex items-center justify-center border rounded-lg w-20 h-10 cursor-pointer male ${
-                        selectedGender === "male"
-                          ? "border-blue-500 bg-blue-100"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      <input
-                        id="male"
-                        type="radio"
-                        value="male"
-                        checked={selectedGender === "male"}
-                        onChange={() => setSelectedGender("male")}
-                        className="hidden"
-                      />
-                      남
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="social-icons-tabs">
-                <label>인플루언서 유형</label>
-                <div className="flex items-center gap-2">
-                  {icons.map((icon, index) => (
-                    <div
-                      key={index}
-                      className={`fb ${activeIndex[index] ? "active" : ""}`}
-                      onClick={() => {
-                        if(activeIndex[index]){
-                          const newActiveIndex = {...activeIndex};
-                          delete newActiveIndex[index];
-                          setActiveIndex(newActiveIndex);
-                        }else{
-                          setActiveIndex({...activeIndex, [index]: [icon.alt]});
-                        }
-                        console.log(activeIndex);
-                      }}
-                    >
-                      <img src={icon.src} alt={icon.alt} />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <label htmlFor="" className="block">
+                상호명
+                <span>*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="상호명을 입력해주세요"
+                {...register("businessName", { required: true })}
+              />
+              <p className="message">필수 입력 사항입니다.</p>
 
               <label htmlFor="" className="block">
                 네이버 플레이스 or 홈페이지 주소 URL
               </label>
-              
-              {Object.keys(activeIndex).map((index) => (
-                <input
-                  onChange={(e) => {
-                    const newActiveIndex = {...activeIndex};
-                    newActiveIndex[index] = [activeIndex[index][0], e.target.value];
-                    setActiveIndex(newActiveIndex);
-                    console.log(activeIndex);
-                  }}
-                  key={index}
-                  type="text"
-                  placeholder={`${activeIndex[index]}의 주소를 입력하세요`}
-                  className="influencer-input"
-                />
-              ))}
+              <input
+                type="text"
+                placeholder="주소를 입력해주세요"
+                {...register("address", { required: true })}
+              />
+              <p className="message">
+                본인의 업체와 관계없는 링크 기입 시 불이익이 있을 수 있습니다.
+              </p>
+              {/* Sign up path */}
+              <label htmlFor="" className="block">
+                가입 경로
+                <span>*</span>
+              </label>
+              <input
+                type="text"
+                id="registrationPath"
+                name="registrationPath"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                required
+                placeholder="가입 경로를 입력해주세요"
+                {...register("signupPath", { required: true })}
+              />
 
-              <div className="checkbox-container mt-8">
+              <div className="checkbox-container">
                 <label htmlFor="">약관 동의</label>
                 <div className="flex items-center justify-between ">
                   <div className="flex items-center gap-6">
@@ -307,6 +229,15 @@ const SignUp3 = () => {
               <button className="sigup-button">가입하기</button>
             </form>
           </div>
+        </div>
+
+        <div className="how-to-use mx-auto">
+          <ul className="flex gap-6 mt-4">
+            <li>About us</li>
+            <li>Become Merchant</li>
+            <li>How to use</li>
+            <li>Privacy policy</li>
+          </ul>
         </div>
       </div>
     </>
