@@ -14,7 +14,7 @@ const EventNotificationsPage = () => {
       .catch((error) => {
         console.error("Error fetching notifications:", error);
       });
-  }, []);
+  }, []); 
 
   return (
     <div className="container mt-5 basic-campian-section 2xl:px-12 lg:px-5">
