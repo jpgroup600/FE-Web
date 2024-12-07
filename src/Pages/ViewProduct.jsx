@@ -7,6 +7,7 @@ import { Link, useParams } from "react-router-dom";
 import { AppProvider } from "../ContextApi/Api";
 import { AuthContext } from "../App";
 import useTimeLeft from "../hooks/useTimeLeft";
+import DOMPurify from 'dompurify';
 
 const HeaderText = ({ product }) => {
 
@@ -122,8 +123,10 @@ const DetailedInfo = React.forwardRef(({ title = null, content = null }, ref) =>
                     <div className="detailed-title-text font-[700] text-[1.3rem]">{title}</div>
                 </div>
                 <div className="detailed-info-content-container flex justify-start items-center pr-8 w-3/4">
-                    <div className="detailed-info-content-title font-[400] text-[1rem] max-w-full overflow-hidden">
-                        {content}
+                    <div className="detailed-info-content-title font-[400] text-[1rem] max-w-full overflow-hidden"
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
+                    >
+                        
                     </div>
                 </div>
             </div>

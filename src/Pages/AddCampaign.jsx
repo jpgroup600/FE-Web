@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext } from "react";
+import React, { useEffect, useRef, useContext,setEffect } from "react";
 import Plus from "../assets/images/plus.svg";
 import { useState } from "react";
 import { basicSettings } from "../Constants/ConstBasic";
@@ -9,7 +9,8 @@ import ImageUploader from "../Components/ImageUploader";
 import apiUrl from "../hooks/apiUrl";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const AddCampaign = () => {
   const { email, token, userID } = useContext(AuthContext); // Access context values
@@ -20,7 +21,7 @@ const AddCampaign = () => {
   const [mainFiles, setMainFiles] = useState([]);
   const thumbnailInputRef = useRef(null);
   const mainInputRef = useRef(null);
-  
+
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [thumbnailPath, setThumbnailPath] = useState([]);
@@ -31,20 +32,33 @@ const AddCampaign = () => {
   const navigate = useNavigate();
   // console.log(token, "token");
 
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],  // dropdown with colors
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['link', 'image'],
+      ['clean']
+    ]
+  };
 
 
-  const handleMainFileChange = async (event,setFilesState, fileState, setImagepathState, maxFiles) => {
+
+  const handleMainFileChange = async (event, setFilesState, fileState, setImagepathState, maxFiles) => {
     const newFiles = Array.from(event.target.files);
     console.log("mainFiles", fileState);
-    if(fileState.length + newFiles.length <= maxFiles) {
+    if (fileState.length + newFiles.length <= maxFiles) {
       setFilesState([...fileState, ...newFiles]);
 
       try {
         const uploadedFiles = await uploadImages(newFiles);
         console.log("uploadedFiles", uploadedFiles);
 
-        if(uploadedFiles) {
-          const newPaths = uploadedFiles.files.map(file => apiUrl+"/"+file.path)
+        if (uploadedFiles) {
+          const newPaths = uploadedFiles.files.map(file => apiUrl + "/" + file.path)
           setImagepathState(prev => [...prev, ...newPaths]);
           console.log("newPaths", newPaths)
 
@@ -63,41 +77,43 @@ const AddCampaign = () => {
 
   };
 
+  const fetchHeads = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/final/getheadings`);
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch banners");
+      }
+      
+      // Set the state once with all the data
+      const headingsData = response.data.headings[0];
+      console.log("Setting initial data:", headingsData);
+      setFill(headingsData);
+       // Get tabs data
+      const tabsResponse = await axios.get(`${apiUrl}/final/getTabs`);
+      if (tabsResponse.status !== 200) {
+        throw new Error("Failed to fetch Tabs");
+      }
+      settabs(tabsResponse.data.tabs[0].stringsArray);
+     } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchHeads = async () => {
-      try {
-        const response = await axios.get(
-          `${apiUrl}/final/getheadings`
-        );
-        if (!response.status == 200) {
-          throw new Error("Failed to fetch banners");
-        }
-
-        // console.log(response.data.headings[0]);
-
-        setFill(response.data.headings[0]);
-      } catch (error) {
-        console.error("Error fetching banners:", error);
-      }
-      try {
-        const response = await axios.get(
-          `${apiUrl}/final/getTabs`
-        );
-        if (!response.status == 200) {
-          throw new Error("Failed to fetch Tabs");
-        }
-
-        // console.log(response.data.tabs[0].stringsArray);
-        settabs(response.data.tabs[0].stringsArray);
-        // setFill(response.data.headings[0]);
-      } catch {
-        console.error("Error fetching Tabs:", error);
-      }
-    };
+    
 
     fetchHeads();
+    console.log("Component mounted - fetching data");
   }, []);
- 
+
+  useEffect (() => {
+    console.log("Fill state changed:", {
+      time: new Date().toISOString(),
+      data: fill,
+      dataKeys: fill ? Object.keys(fill) : []
+    });
+  }, [fill])
+
 
   const uploadImages = async (fileArray) => {
     const formData = new FormData();
@@ -226,9 +242,6 @@ const AddCampaign = () => {
     });
   };
 
-  useEffect(() => {
-    // console.log("UserId", localStorage.getItem("userID"));
-  });
 
   const handleSubmit = async () => {
     if (!userData.campaignName || mainImagePaths.length === 0 || thumbnailPath.length === 0) {
@@ -240,7 +253,7 @@ const AddCampaign = () => {
 
     try {
       const derivedData = {
-        service:userData.service,
+        service: userData.service,
         email,
         campaignName: userData.campaignName,
         isVisitOrShip: activeVisit ? "Visit" : "Ship",
@@ -252,18 +265,18 @@ const AddCampaign = () => {
         numberOfPeople: userData.member,
         image:
           thumbnailPath || " ",
-        textArea1: userData.Info,
-        textArea2: userData.howtoregister,
-        textArea3: userData.keywords,
-        textArea4: userData.aditionalinfo,
-        textArea5: "Additional details",
+        textArea1: fill.field1,
+        textArea2: fill.field2,
+        textArea3: fill.field3,
+        textArea4: fill.field4,
+        textArea5: fill.field5,
         channel: activeChanel.join(", "),
         image1: mainImagePaths || " ",
         catagory: userData.catagory,
         token: localStorage.getItem("token")
       };
       const response = await fetch(
-        "https://webjacob-c0f6c8e947aa.herokuapp.com/products/add",
+        `${apiUrl}/products/add`,
         {
           method: "POST",
           headers: {
@@ -303,7 +316,7 @@ const AddCampaign = () => {
         <div className=" 2xl:px-12">
           <div className="basic-setting 2xl:px-14 lg:px-2">
             <h2>캠페인 설정</h2>
-            
+
             <button className="reset">초기화</button>
           </div>
           <div className="basic-setting-main-page">
@@ -346,8 +359,8 @@ const AddCampaign = () => {
               <div className="form-input-group">
                 <label>서비스명</label>
                 <textarea name="Info" id="" rows={10} value={userData.service} onChange={(e) =>
-                    setUserData({ ...userData, service: e.target.value })
-                  }></textarea>
+                  setUserData({ ...userData, service: e.target.value })
+                }></textarea>
               </div>
             </div>
             <div className="form-data">
@@ -360,8 +373,8 @@ const AddCampaign = () => {
                   }
                   className="w-full mt-4 h-[50px] px-4 rounded-[5px]"
                 >
-                  {tabs.map((category) => (
-                    <option value={category}>{category}</option>
+                  {tabs.map((category,index) => (
+                    <option value={category} key={`${category}-${index}`}>{category}</option>
                   ))}
                 </select>
               </div>
@@ -605,11 +618,11 @@ const AddCampaign = () => {
 
               <div
                 className={` ${activeVisit ? "ship" : "visti"}`}
-                // onClick={() => {
-                //   setActiveVisit(false);
-                //   console.log(activeVisit);
-                //   setUserData({ ...userData, campaignType: "ship" });
-                // }}
+              // onClick={() => {
+              //   setActiveVisit(false);
+              //   console.log(activeVisit);
+              //   setUserData({ ...userData, campaignType: "ship" });
+              // }}
               >
                 <h4>배송</h4>
                 <p>배송 후 리뷰</p>
@@ -622,109 +635,131 @@ const AddCampaign = () => {
             {/* Drop */}
 
             <ImageUploader
-            title="썸네일 이미지를 넣어주세요 (최대 3개)"
-            onClick={() => {handleImageClick(thumbnailInputRef)}}
-            files={thumbnailFiles}
-            inputRef={thumbnailInputRef}
-            onFileChange={(event) => handleMainFileChange(event,setThumbnailFiles, thumbnailFiles, setThumbnailPath, ThumbnailMaxFiles)}
-            multiple={true}
-            maxFiles={ThumbnailMaxFiles}
+              title="썸네일 이미지를 넣어주세요 (최대 3개)"
+              onClick={() => { handleImageClick(thumbnailInputRef) }}
+              files={thumbnailFiles}
+              inputRef={thumbnailInputRef}
+              onFileChange={(event) => handleMainFileChange(event, setThumbnailFiles, thumbnailFiles, setThumbnailPath, ThumbnailMaxFiles)}
+              multiple={true}
+              maxFiles={ThumbnailMaxFiles}
             >
 
             </ImageUploader>
 
             <ImageUploader
-            title="상세 이미지를 넣어주세요 (최대 5개)"
-            onClick={() => {handleImageClick(mainInputRef)}}
-            files={mainFiles}
-            inputRef={mainInputRef}
-            onFileChange={(event) => handleMainFileChange(event,setMainFiles, mainFiles, setMainImagePaths, MainMaxFiles)}
-            multiple={true}
-            maxFiles={MainMaxFiles}
+              title="상세 이미지를 넣어주세요 (최대 5개)"
+              onClick={() => { handleImageClick(mainInputRef) }}
+              files={mainFiles}
+              inputRef={mainInputRef}
+              onFileChange={(event) => handleMainFileChange(event, setMainFiles, mainFiles, setMainImagePaths, MainMaxFiles)}
+              multiple={true}
+              maxFiles={MainMaxFiles}
             >
 
             </ImageUploader>
 
-           
+
 
             {/* text area  */}
             <div className="form-data ">
               <div className="form-input-group">
-                <label>Info</label>
-                <textarea
+                <label>제공 내역</label>
+                <ReactQuill
+                  modules={modules}
+                  style={{ resize: "vertical", overflowY: "auto", height: "200px" }}
                   value={fill?.field1}
-                  name="Info"
-                  id=""
-                  rows={10}
                   onChange={(e) => {
-                    setFill({ ...fill, field1: e.target.value });
-                    setUserData({ ...userData, Info: e.target.value });
-                  }}
-                ></textarea>
+                    setFill(prevFill => ({
+                      ...prevFill,  // Keep all existing fields
+                      field1: e     // Update only field1
+                    }));
+                    setUserData(prevData => ({
+                      ...prevData,
+                      field1: e
+                    }));
+                  }}d
+                  
+                >
+                </ReactQuill>
+
               </div>
             </div>
 
             <div className="form-data ">
               <div className="form-input-group">
-                <label>신청 방법</label>
-                <textarea
-                  name="How to Register"
-                  id=""
-                  rows={10}
+                <label>방문 및 예약 안내</label>
+                <ReactQuill
+                  modules={modules}
+                  style={{ resize: "vertical", overflowY: "auto", height: "200px" }}
                   value={fill?.field2}
                   onChange={(e) => {
-                    setFill({ ...fill, field2: e.target.value });
-                    setUserData({ ...userData, howtoregister: e.target.value });
+                    setFill(prevFill => ({
+                      ...prevFill,
+                      field2: e
+                    }));
+                    setUserData(prevData => ({
+                      ...prevData, field2: e }));
                   }}
-                ></textarea>
+                  
+                ></ReactQuill>
               </div>
             </div>
 
             <div className="form-data ">
               <div className="form-input-group">
-                <label>미션</label>
-                <textarea
-                  name="Mission"
+                <label>캠페인 미션</label>
+                <ReactQuill
+                  modules={modules}
+                  style={{ resize: "vertical", overflowY: "auto", height: "200px" }}
                   value={fill?.field3}
-                  id=""
-                  rows={10}
                   onChange={(e) => {
-                    setFill({ ...fill, field3: e.target.value });
-                    setUserData({ ...userData, mission: e.target.value });
+                    setFill(prevFill => ({
+                      ...prevFill,
+                      field3: e
+                    }));
+                    setUserData(prevData => ({
+                      ...prevData, field3: e }));
                   }}
-                ></textarea>
+                ></ReactQuill>
               </div>
             </div>
 
             <div className="form-data ">
               <div className="form-input-group">
                 <label>키워드</label>
-                <textarea
-                  name="Keywords"
+                
+                <ReactQuill
+                  modules={modules}
+                  style={{ resize: "vertical", overflowY: "auto", height: "200px" }}
                   value={fill?.field4}
-                  id=""
-                  rows={10}
                   onChange={(e) => {
-                    setFill({ ...fill, field4: e.target.value });
-                    setUserData({ ...userData, keywords: e.target.value });
+                    setFill(prevFill => ({
+                      ...prevFill,
+                      field4: e
+                    }));
+                    setUserData(prevData => ({
+                      ...prevData, field4: e }));
                   }}
-                ></textarea>
+                ></ReactQuill>
               </div>
             </div>
 
             <div className="form-data ">
               <div className="form-input-group">
-                <label>추가 정보</label>
-                <textarea
-                  name="Aditional Info"
+                <label>추가 안내사항</label>
+                <ReactQuill
+                  modules={modules}
+                  style={{ resize: "vertical", overflowY: "auto", height: "200px" }}
                   value={fill?.field5}
-                  id=""
-                  rows={10}
                   onChange={(e) => {
-                    setFill({ ...fill, field5: e.target.value });
-                    setUserData({ ...userData, aditionalinfo: e.target.value });
+                    setFill(prevFill => ({
+                      ...prevFill,
+                      field5: e
+                    }));
+                    setUserData(prevData => ({
+                      ...prevData, field5: e }));
                   }}
-                ></textarea>
+                ></ReactQuill>
               </div>
             </div>
             {/* Adress to visit */}

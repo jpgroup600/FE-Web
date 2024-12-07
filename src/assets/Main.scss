@@ -706,6 +706,15 @@ footer {
 
 // Basic Seeting
 .basic-campian-section {
+
+  p {
+    font-family: unset !important;
+    font-size: unset !important;
+    font-weight: unset !important;
+    line-height: unset !important;
+    text-align: unset !important;
+    color: unset !important;
+  }
   padding: 50px;
   max-width: 1220px;
   margin: 0 auto;
