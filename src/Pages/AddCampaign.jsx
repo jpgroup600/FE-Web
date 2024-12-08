@@ -273,7 +273,8 @@ const AddCampaign = () => {
         channel: activeChanel.join(", "),
         image1: mainImagePaths || " ",
         catagory: userData.catagory,
-        token: localStorage.getItem("token")
+        token: localStorage.getItem("token"),
+        businessName: localStorage.getItem("businessName"),
       };
       const response = await fetch(
         `${apiUrl}/products/add`,
