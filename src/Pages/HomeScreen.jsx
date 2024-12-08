@@ -61,7 +61,7 @@ const ContentItem = ({ product, color = "black" }) => {
                     <span className={`${color === "white" ? "text-white" : "text-black"}`}>{useTimeLeft(product.createdAt)}일 남음</span>
                     <span className={`${color === "white" ? "text-white" : "text-black"}`}>참여인원 <span className="text-[#2C9512]">{product.registeredUsers.length}</span>/ {product.numberOfPeople}</span>
                 </div>
-                <div className={`content-title flex items-center gap-2 font-[500] ${color === "white" ? "text-white" : "text-black"}`}><span>[회사명]</span><span>{product.campaignName}</span></div>
+                <div className={`content-title flex items-center gap-2 font-[500] ${color === "white" ? "text-white" : "text-black"}`}><span>{`[${product.businessName}]`}</span><span>{product.campaignName}</span></div>
                 <div className={`content-description ${color === "white" ? "text-white" : "text-[#6d6d6d]"} text-[0.9rem]`}>5만원 이용권</div>
             </div>
             </Link>
@@ -81,9 +81,67 @@ const EventBanner = ({ }) => {
 const HomeScreen = () => {
     const [products, setProducts] = useState([]);
     const [limitProducts, setLimitProducts] = useState([]);
+    const [timer, setTimer] = useState("")
+
+const runTimer = () => {
+    const generateTimeForToday = () => {
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        // Generate a consistent time based on the current date
+        // This will be same for all users on the same day
+        const seed = startOfDay.getTime();
+        const pseudoRandom = Math.sin(seed) * 10000;
+        
+        // Generate hours between 11 and 23
+        const hours = Math.floor(Math.abs(pseudoRandom) % 12) + 11;
+        const minutes = Math.floor(Math.abs(Math.sin(seed + 1) * 10000) % 60);
+        const seconds = Math.floor(Math.abs(Math.sin(seed + 2) * 10000) % 60);
+        
+        return {
+          hours,
+          minutes,
+          seconds
+        };
+    };
+     const updateTimer = () => {
+        setTimer(prevTime => {
+          if (!prevTime) {
+            const initialTime = generateTimeForToday();
+            return `${String(initialTime.hours).padStart(2, '0')}:${String(initialTime.minutes).padStart(2, '0')}:${String(initialTime.seconds).padStart(2, '0')}`;
+          }
+           const [hours, minutes, seconds] = prevTime.split(":").map(Number);
+          
+          let newSeconds = seconds - 1;
+          let newMinutes = minutes;
+          let newHours = hours;
+           if (newSeconds < 0) {
+            newSeconds = 59;
+            newMinutes -= 1;
+          }
+          
+          if (newMinutes < 0) {
+            newMinutes = 59;
+            newHours -= 1;
+          }
+          
+          // When timer reaches 0, generate new time for next day
+          if (newHours < 0) {
+            const newTime = generateTimeForToday();
+            newHours = newTime.hours;
+            newMinutes = newTime.minutes;
+            newSeconds = newTime.seconds;
+          }
+           return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}:${String(newSeconds).padStart(2, '0')}`;
+        });
+    };
+     const timerInterval = setInterval(updateTimer, 1000);
+     return () => clearInterval(timerInterval);
+}
+
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/products/public`)
+            const response = await axios.get(`${apiUrl}/products/approved`)
             if (response.status === 200) {
                 const limitProducts = response.data.filter(product => product.setToCompaign === true);
                 const normalProducts = response.data.filter(product => product.setToCompaign != true);
@@ -100,6 +158,7 @@ const HomeScreen = () => {
     }
 
     useEffect(() => {
+        runTimer();
         fetchData();
     }, []);
 
@@ -140,7 +199,7 @@ const HomeScreen = () => {
                 ">
 
                     <div className="text-[1.5rem] font-[600] text-white">마감까지 남은 시간</div>
-                    <div className="text-[2.5rem] font-[600] text-white">11:24:32</div>
+                    <div className="text-[2.5rem] font-[600] text-white">{timer}</div>
 
                     <div className="time-deal-container grid grid-cols-4 gap-4 ">
                         {limitProducts.length > 0 ? (
