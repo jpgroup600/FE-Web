@@ -574,7 +574,7 @@ const AddCampaign = () => {
               </div>
 
               <div className="basic-setting-headin flex flex-col">
-                <h1 className="font-bold">Campaign info</h1>
+                <h1 className="font-bold">캠페인 설정</h1>
                 <h3
                   style={{
                     fontWeight: 400,
@@ -583,7 +583,7 @@ const AddCampaign = () => {
                   }}
                   className="font-bold"
                 >
-                  Campaign info2
+                  방문 / 배송
                 </h3>
               </div>
 

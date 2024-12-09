@@ -62,7 +62,7 @@ const ContentItem = ({ product, color = "black" }) => {
                     <span className={`${color === "white" ? "text-white" : "text-black"}`}>참여인원 <span className="text-[#2C9512]">{product.registeredUsers.length}</span>/ {product.numberOfPeople}</span>
                 </div>
                 <div className={`content-title flex items-center gap-2 font-[500] ${color === "white" ? "text-white" : "text-black"}`}><span>{`[${product.businessName}]`}</span><span>{product.campaignName}</span></div>
-                <div className={`content-description ${color === "white" ? "text-white" : "text-[#6d6d6d]"} text-[0.9rem]`}>5만원 이용권</div>
+                <div className={`content-description ${color === "white" ? "text-white" : "text-[#6d6d6d]"} text-[0.9rem]`}>{product.service.length > 20 ? product.service.slice(0, 20) + "..." : product.service}</div>
             </div>
             </Link>
         </div>
@@ -178,7 +178,7 @@ const runTimer = () => {
                 <CategoryItem title="Title" image={Logo} />
             </div>
 
-            <div className="mt-20 text-[1.5rem] font-[600] text-[#2C9512]">Category</div>
+            <div className="mt-20 text-[1.5rem] font-[600] text-[#2C9512]">오늘의 상품</div>
             <div className="content-container w-full grid grid-cols-4 gap-4">
                 {firstProduct.length > 0 ? (
                     firstProduct.map((product) => (
@@ -214,7 +214,7 @@ const runTimer = () => {
                 </div>
             </div>
 
-            <div className="mt-20 text-[1.5rem] font-[600] text-[#2C9512]">Category</div>
+            <div className="mt-20 text-[1.5rem] font-[600] text-[#2C9512]">오늘의 상품</div>
             <div className="content-container w-full grid grid-cols-4 gap-4">
                 {secondProduct.length > 0 ? (
                     secondProduct.map((product) => (
